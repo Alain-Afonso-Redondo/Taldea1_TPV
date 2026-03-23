@@ -7,7 +7,7 @@ namespace Taldea1TPV.Eskariak
 {
     internal class KategoriakController
     {
-        private readonly string _baseUrl = "http://192.168.2.101:5000/";
+        private readonly string _baseUrl = "http://localhost:5000/";
 
         // API-tik Kategoria guztiak lortzea
         public List<Kategoriak> LortuKategoriak()

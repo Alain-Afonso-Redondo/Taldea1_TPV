@@ -9,7 +9,7 @@ namespace Taldea1TPV.Eskariak
 {
     internal class FakturakController
     {
-        private readonly string _baseUrl = "http://192.168.2.101:5000/";
+        private readonly string _baseUrl = "http://localhost:5000/";
 
         // ================== GET GUZTIAK ==================
         public List<Fakturak> LortuFakturak()

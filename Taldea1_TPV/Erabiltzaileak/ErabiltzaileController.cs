@@ -11,7 +11,7 @@ namespace Taldea1TPV
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new System.Uri("http://192.168.2.101:5000/");
+                client.BaseAddress = new System.Uri("http://localhost:5000/");
 
                 
                 var response = client.GetAsync("api/Erabiltzailea").Result;
