@@ -10,7 +10,7 @@ namespace Taldea1TPV.Eskariak
 {
     public class ErreserbaMahaiController
     {
-        private readonly string _baseUrl = "http://localhost:5000/";
+        private readonly string _baseUrl = "http://localhost:5093/";
 
         public bool GehituMahaiErreserbara(int erreserbaId, int mahaiId)
         {

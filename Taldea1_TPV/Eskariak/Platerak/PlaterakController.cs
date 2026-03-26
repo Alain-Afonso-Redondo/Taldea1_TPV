@@ -1,149 +1,120 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using Newtonsoft.Json;
-using System.Text;
 using Taldea1TPV.DTO;
-
 
 namespace Taldea1TPV.Eskariak
 {
     internal class PlaterakController
     {
-        private readonly string _baseUrl = "http://localhost:5000/";
+        private readonly string _baseUrl = ApiConfig.BaseUrl;
 
-        
-        // API-tik Plater guztiak lortzea
         public List<Platerak> LortuPlaterak()
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-
-                
-                var response = client.GetAsync("api/Platerak").Result;
+                var response = client.GetAsync("api/produktuak").Result;
 
                 if (!response.IsSuccessStatusCode)
                     return new List<Platerak>();
 
                 var json = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<List<Platerak>>(json);
+                var erantzuna = JsonConvert.DeserializeObject<ApiErantzuna<PlaterakDto>>(json);
+
+                if (erantzuna == null || erantzuna.Datuak == null)
+                    return new List<Platerak>();
+
+                return erantzuna.Datuak.Select(MapToPlatera).ToList();
             }
         }
 
-        
-        // Platera lortzea Id-aren arabera
         public Platerak LortuPlatera(int id)
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-
-                var response = client.GetAsync($"api/Platerak/{id}").Result;
+                var response = client.GetAsync(string.Format("api/produktuak/{0}", id)).Result;
 
                 if (!response.IsSuccessStatusCode)
                     return null;
 
                 var json = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<Platerak>(json);
+                var erantzuna = JsonConvert.DeserializeObject<ApiErantzuna<PlaterakDto>>(json);
+                var platera = erantzuna != null && erantzuna.Datuak != null
+                    ? erantzuna.Datuak.FirstOrDefault()
+                    : null;
+
+                return platera == null ? null : MapToPlatera(platera);
             }
         }
 
-
-        // Platerak lortzea kategoriaren arabera
         public List<PlaterakDto> LortuPlaterakKategoriatik(int kategoriaId)
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri("http://192.168.2.101:5000/");
-
-                var response = client.GetAsync($"api/Platerak/kategoria/{kategoriaId}").Result;
+                client.BaseAddress = new Uri(_baseUrl);
+                var response = client.GetAsync("api/produktuak").Result;
 
                 if (!response.IsSuccessStatusCode)
                     return new List<PlaterakDto>();
 
                 var json = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<List<PlaterakDto>>(json);
+                var erantzuna = JsonConvert.DeserializeObject<ApiErantzuna<PlaterakDto>>(json);
+
+                return erantzuna != null && erantzuna.Datuak != null
+                    ? erantzuna.Datuak.Where(p => p.KategoriaId == kategoriaId).ToList()
+                    : new List<PlaterakDto>();
             }
         }
 
-
-
-        // Plater berria sortzea
         public bool SortuPlatera(Platerak platera)
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-
                 var json = JsonConvert.SerializeObject(platera);
                 var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
-                var response = client.PostAsync("api/Platerak", content).Result;
-
+                var response = client.PostAsync("api/produktuak", content).Result;
                 return response.IsSuccessStatusCode;
             }
         }
 
-        
-        // Platera ezabatzea Id-aren arabera
         public bool EzabatuPlatera(int id)
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-
-                var response = client.DeleteAsync($"api/Platerak/{id}").Result;
-
+                var response = client.DeleteAsync(string.Format("api/produktuak/{0}", id)).Result;
                 return response.IsSuccessStatusCode;
             }
         }
-        // Karritora gehitzean plateraren stock-a jaistea
+
         public bool JaitsiStock(int platerId, int kopurua)
         {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(_baseUrl);
-
-                var body = new
-                {
-                    PlaterId = platerId,
-                    Kopurua = kopurua
-                };
-
-                var json = JsonConvert.SerializeObject(body);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                
-                var response = client.PostAsync("api/Platerak/jaitsi-stock", content).Result;
-
-                return response.IsSuccessStatusCode;
-            }
+            var platera = LortuPlatera(platerId);
+            return platera != null && platera.Stock >= kopurua;
         }
-        // Karritotik kentzean plateraren stock berreskuratzea
+
         public void ItzuliStock(int platerId, int kopurua)
         {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(_baseUrl);
-
-                var body = new
-                {
-                    PlaterId = platerId,
-                    Kopurua = kopurua
-                };
-
-                var json = JsonConvert.SerializeObject(body);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-               
-                client.PostAsync("api/Platerak/itzuli-stock", content).Wait();
-            }
         }
 
-
-
-
-
+        private static Platerak MapToPlatera(PlaterakDto platera)
+        {
+            return new Platerak
+            {
+                Id = platera.Id,
+                Izena = platera.Izena,
+                Prezioa = platera.Prezioa,
+                Stock = platera.Stock,
+                Kategoriak = new Kategoriak
+                {
+                    Id = platera.KategoriaId
+                }
+            };
+        }
     }
 }

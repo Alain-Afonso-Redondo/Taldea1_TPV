@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Globalization;
-using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -9,21 +8,17 @@ namespace Taldea1TPV.Eskariak
 {
     public partial class MahaiakForm : Form
     {
-        string erabiltzailea;
+        private readonly Erabiltzaileak _erabiltzailea;
         private int mahaiaZabalera;
         private int mahaiaAltuera;
         private bool hasieraEginda = false;
-
         private int? _mahaiHautatuaId = null;
+        private string _txandaAukeratua = null;
 
-
-        // ===== TXANDA =====
-        private string _txandaAukeratua = null; // "Bazkaria" | "Afaria"
-
-        public MahaiakForm(string erabiltzailea)
+        public MahaiakForm(Erabiltzaileak erabiltzailea)
         {
             InitializeComponent();
-            this.erabiltzailea = erabiltzailea;
+            _erabiltzailea = erabiltzailea;
         }
 
         private void MahaiakForm_Load(object sender, EventArgs e)
@@ -34,7 +29,6 @@ namespace Taldea1TPV.Eskariak
 
             EguneratuDataEuskera();
 
-            // ===== TXANDA CLICK =====
             cboxBazkaria.Click += (s, ev) => AukeratuTxanda("Bazkaria");
             cboxAfaria.Click += (s, ev) => AukeratuTxanda("Afaria");
 
@@ -58,8 +52,8 @@ namespace Taldea1TPV.Eskariak
                 }
             };
 
-
-
+            _txandaAukeratua = "Bazkaria";
+            cboxBazkaria.Checked = true;
         }
 
         protected override void OnShown(EventArgs e)
@@ -72,7 +66,6 @@ namespace Taldea1TPV.Eskariak
 
         private static readonly CultureInfo euskalCulture = new CultureInfo("eu-ES");
 
-        // ================= DATA =================
         private void EguneratuDataEuskera()
         {
             string txt = dtimeData.Value.ToString("dddd, dd MMMM yyyy", euskalCulture);
@@ -85,7 +78,6 @@ namespace Taldea1TPV.Eskariak
             kargatuMahaiak();
         }
 
-        // ================= TXANDA =================
         private void AukeratuTxanda(string txanda)
         {
             _txandaAukeratua = txanda;
@@ -104,7 +96,6 @@ namespace Taldea1TPV.Eskariak
             kargatuMahaiak();
         }
 
-        // ================= TAMAINA =================
         private void KalkulatuMahaiTamainak()
         {
             int w = flpMahaiak.ClientSize.Width;
@@ -113,7 +104,6 @@ namespace Taldea1TPV.Eskariak
             mahaiaAltuera = (int)(mahaiaZabalera * 0.7);
         }
 
-        // ================= MAHAIAK =================
         private void kargatuMahaiak()
         {
             flpMahaiak.Controls.Clear();
@@ -123,60 +113,35 @@ namespace Taldea1TPV.Eskariak
                 return;
 
             var mahaiCtrl = new MahaiakController();
-            var erreserbaCtrl = new ErreserbakController();
-            var erreserbaMahaiCtrl = new ErreserbaMahaiController();
-
             var mahaiak = mahaiCtrl.LortuMahaiak();
-
-            var erreserbak = erreserbaCtrl.LortuErreserbak()
-                .Where(e =>
-                    e.Data.Date == dtimeData.Value.Date &&
-                    e.Txanda == _txandaAukeratua)
-                .ToList();
-
-            var mahaiOkupatuak = erreserbak
-                .SelectMany(e => erreserbaMahaiCtrl.LortuMahaiakErreserbarentzat(e.Id))
-                .Distinct()
-                .ToList();
 
             foreach (var mahai in mahaiak)
             {
                 var panel = mahaiaSortu(mahai);
+                panel.BackColor = mahai.Egoera == "okupatuta"
+                    ? Color.FromArgb(255, 230, 230)
+                    : Color.White;
+                panel.Cursor = Cursors.Hand;
 
-                if (mahaiOkupatuak.Contains(mahai.Id))
+                panel.Click += (s, e) =>
                 {
-                    panel.BackColor = Color.FromArgb(255, 230, 230); // OKUPATUTA
-                    panel.Cursor = Cursors.Hand;
-
-                   
-                    var lblEgoera = panel.Tag as Label;
-                    if (lblEgoera != null)
+                    foreach (Control c in flpMahaiak.Controls)
                     {
-                        lblEgoera.Text = "OKUPATUTA";
-                        lblEgoera.ForeColor = Color.FromArgb(160, 40, 40);
+                        var kontrolMahaia = c.Tag as Mahaiak;
+                        c.BackColor = kontrolMahaia != null && kontrolMahaia.Egoera == "okupatuta"
+                            ? Color.FromArgb(255, 230, 230)
+                            : Color.White;
                     }
 
-                    panel.Click += (s, e) =>
-                    {
-                        foreach (Control c in flpMahaiak.Controls)
-                            c.BackColor = Color.White;
+                    panel.BackColor = Color.FromArgb(220, 240, 225);
+                    _mahaiHautatuaId = mahai.Id;
+                };
 
-                        panel.BackColor = Color.FromArgb(220, 240, 225);
-                        _mahaiHautatuaId = mahai.Id;
-                    };
-                }
-
-                else
-                {
-                    panel.BackColor = Color.FromArgb(235, 235, 235); // EZ DISPONIBLE
-                }
-
+                panel.Tag = mahai;
                 flpMahaiak.Controls.Add(panel);
             }
         }
 
-
-        // ================= PANEL MAHAIA =================
         private Control mahaiaSortu(Mahaiak mahai)
         {
             Panel p = new Panel
@@ -186,7 +151,7 @@ namespace Taldea1TPV.Eskariak
                 BackColor = Color.White,
                 Margin = new Padding(16),
                 Padding = new Padding(14),
-                Tag = mahai.Id
+                Tag = mahai
             };
 
             p.Paint += (s, e) =>
@@ -195,7 +160,7 @@ namespace Taldea1TPV.Eskariak
 
             Label lblMahaiZenbakia = new Label
             {
-                Text = $"MAHAIA {mahai.MahaiZenbakia}",
+                Text = string.Format("MAHAIA {0}", mahai.Zenbakia),
                 Font = new Font("Segoe UI", 13F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(29, 80, 91),
                 Dock = DockStyle.Top,
@@ -204,7 +169,7 @@ namespace Taldea1TPV.Eskariak
 
             Label lblPertsonaMax = new Label
             {
-                Text = $"{mahai.PertsonaMax} pertsona",
+                Text = string.Format("{0} pertsona", mahai.Kapazitatea),
                 Font = new Font("Segoe UI", 10F),
                 ForeColor = Color.DimGray,
                 Dock = DockStyle.Top
@@ -212,15 +177,14 @@ namespace Taldea1TPV.Eskariak
 
             Label lblEgoera = new Label
             {
-                Text = "LIBRE",
+                Text = (mahai.Egoera ?? "libre").ToUpper(),
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(28, 95, 43),
+                ForeColor = mahai.Egoera == "okupatuta"
+                    ? Color.FromArgb(160, 40, 40)
+                    : Color.FromArgb(28, 95, 43),
                 Dock = DockStyle.Bottom,
                 TextAlign = ContentAlignment.BottomRight
             };
-
-            
-            p.Tag = lblEgoera;
 
             p.Controls.Add(lblEgoera);
             p.Controls.Add(lblPertsonaMax);
@@ -229,8 +193,6 @@ namespace Taldea1TPV.Eskariak
             return p;
         }
 
-
-        // ================= AUKERATU MAHAIA =================
         private void btnAukeratu_Click(object sender, EventArgs e)
         {
             if (_mahaiHautatuaId == null || _txandaAukeratua == null)
@@ -239,47 +201,20 @@ namespace Taldea1TPV.Eskariak
                 return;
             }
 
-            var erreserbaCtrl = new ErreserbakController();
-            var erreserbaMahaiCtrl = new ErreserbaMahaiController();
-            
+            var mahaiCtrl = new MahaiakController();
+            var mahaia = mahaiCtrl.LortuMahaia(_mahaiHautatuaId.Value);
 
-            var erreserbak = erreserbaCtrl.LortuErreserbak()
-                .Where(o =>
-                    o.Data.Date == dtimeData.Value.Date &&
-                    o.Txanda == _txandaAukeratua)
-                .ToList();
-
-            var erreserba = erreserbak.FirstOrDefault(o =>
-                erreserbaMahaiCtrl
-                    .LortuMahaiakErreserbarentzat(o.Id)
-                    .Contains(_mahaiHautatuaId.Value));
-
-            if (erreserba == null)
+            if (mahaia == null)
             {
-                MessageBox.Show("Ez dago erreserbarik mahaia honentzat");
+                MessageBox.Show("Mahaia ezin izan da kargatu");
                 return;
             }
 
-            // ===== FAkTURA =====
-
-            var fakturaCtrl = new FakturakController();
-            var faktura = fakturaCtrl.SortuEdoLortuFakturaErreserbatik(erreserba.Id);
-
-            if (faktura == null)
-            {
-                MessageBox.Show("Errorea faktura sortzean");
-                return;
-            }
-
-            var f = new EskaerakForm(erabiltzailea, faktura.Id);
+            var f = new EskaerakForm(_erabiltzailea, mahaia.Id, mahaia.Kapazitatea);
             f.Show();
             this.Close();
-
-
         }
 
-
-        // ================= DATE PICKER POPUP =================
         private void lblDataEuskera_Click(object sender, EventArgs e)
         {
             using (Form f = new Form())

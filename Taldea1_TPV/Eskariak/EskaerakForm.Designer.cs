@@ -14,7 +14,6 @@
         private void InitializeComponent()
         {
             this.pnlHeader = new System.Windows.Forms.Panel();
-            this.picLogo = new System.Windows.Forms.PictureBox();
             this.lblErabiltzailea = new System.Windows.Forms.Label();
             this.btnTxat = new System.Windows.Forms.Button();
 
@@ -38,11 +37,7 @@
             this.pnlHeader.Height = 60;
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
 
-            // ================= LOGO ==================
-            this.picLogo.Image = global::Taldea1TPV.Properties.Resources.Logo_Osis_Sales;
-            this.picLogo.Location = new System.Drawing.Point(12, 10);
-            this.picLogo.Size = new System.Drawing.Size(200, 40);
-            this.picLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            
 
             // ================= ERABILTZAILEA ===================
             this.lblErabiltzailea.ForeColor = System.Drawing.Color.WhiteSmoke;
@@ -61,7 +56,6 @@
             this.btnTxat.Location = new System.Drawing.Point(0, 14); // se ajusta al resize
             this.btnTxat.Click += new System.EventHandler(this.btnTxat_Click);
 
-            this.pnlHeader.Controls.Add(this.picLogo);
             this.pnlHeader.Controls.Add(this.lblErabiltzailea);
             this.pnlHeader.Controls.Add(this.btnTxat);
 
@@ -119,7 +113,6 @@
         }
 
         private System.Windows.Forms.Panel pnlHeader;
-        private System.Windows.Forms.PictureBox picLogo;
         private System.Windows.Forms.Label lblErabiltzailea;
         private System.Windows.Forms.Button btnTxat;
 

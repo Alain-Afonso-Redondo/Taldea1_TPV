@@ -1,36 +1,64 @@
-﻿using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using Newtonsoft.Json;
+using Taldea1TPV.DTO;
 
 namespace Taldea1TPV
 {
+    internal static class ApiConfig
+    {
+        public static string BaseUrl
+        {
+            get
+            {
+                var value = ConfigurationManager.AppSettings["ApiBaseUrl"];
+                return string.IsNullOrWhiteSpace(value) ? "http://localhost:5093/" : value;
+            }
+        }
+    }
+
     internal class ErabiltzaileController
     {
-        public bool BalidatuLogin(string erabiltzailea, string pasahitza)
+        public Erabiltzaileak BalidatuLogin(string erabiltzailea, string pasahitza)
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new System.Uri("http://localhost:5000/");
+                client.BaseAddress = new System.Uri(ApiConfig.BaseUrl);
 
-                
-                var response = client.GetAsync("api/Erabiltzailea").Result;
+                var body = new
+                {
+                    erabiltzailea = erabiltzailea,
+                    pasahitza = pasahitza,
+                    txat = false
+                };
+
+                var jsonBody = JsonConvert.SerializeObject(body);
+                var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+                var response = client.PostAsync("api/login", content).Result;
 
                 if (!response.IsSuccessStatusCode)
-                    return false;
+                    return null;
 
                 var json = response.Content.ReadAsStringAsync().Result;
+                var apiErantzuna = JsonConvert.DeserializeObject<ApiErantzuna<LoginErantzunaDto>>(json);
+                var loginDatuak = apiErantzuna != null && apiErantzuna.Datuak != null
+                    ? apiErantzuna.Datuak.FirstOrDefault()
+                    : null;
 
-                
-                var apiErabiltzaileak = JsonConvert.DeserializeObject<List<Erabiltzaileak>>(json);
+                if (loginDatuak == null)
+                    return null;
 
-               
-                return apiErabiltzaileak.Any(e =>
-                    e.Izena == erabiltzailea &&
-                    e.Pasahitza == pasahitza
-                );
+                return new Erabiltzaileak
+                {
+                    Id = loginDatuak.Id,
+                    Erabiltzailea = loginDatuak.Erabiltzailea,
+                    Emaila = loginDatuak.Emaila,
+                    Rola = loginDatuak.Rola != null ? loginDatuak.Rola.Izena : null,
+                    Txat = loginDatuak.Txat
+                };
             }
         }
-
     }
 }

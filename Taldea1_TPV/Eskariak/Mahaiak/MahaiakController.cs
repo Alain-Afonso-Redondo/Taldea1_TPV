@@ -1,80 +1,79 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Taldea1TPV.DTO;
 
 namespace Taldea1TPV.Eskariak
 {
     internal class MahaiakController
     {
-        private readonly string _baseUrl = "http://localhost:5000/";
+        private readonly string _baseUrl = ApiConfig.BaseUrl;
 
-        
-        // API-tik Mahai guztiak lortzea
         public List<Mahaiak> LortuMahaiak()
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-
-                
-                var response = client.GetAsync("api/Mahaiak").Result;
+                var response = client.GetAsync("api/mahaiak").Result;
 
                 if (!response.IsSuccessStatusCode)
                     return new List<Mahaiak>();
 
                 var json = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<List<Mahaiak>>(json);
+                var erantzuna = JsonConvert.DeserializeObject<ApiErantzuna<MahaiaApiDto>>(json);
+
+                return erantzuna != null && erantzuna.Datuak != null
+                    ? erantzuna.Datuak.Select(MapToMahaiak).ToList()
+                    : new List<Mahaiak>();
             }
         }
 
-       
-        // Mahaia lortzea Id-aren arabera
         public Mahaiak LortuMahaia(int id)
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-
-                var response = client.GetAsync($"api/Mahaiak/{id}").Result;
+                var response = client.GetAsync(string.Format("api/mahaiak/{0}", id)).Result;
 
                 if (!response.IsSuccessStatusCode)
                     return null;
 
                 var json = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<Mahaiak>(json);
+                var erantzuna = JsonConvert.DeserializeObject<ApiErantzuna<MahaiaApiDto>>(json);
+
+                return erantzuna != null && erantzuna.Datuak != null
+                    ? erantzuna.Datuak.Select(MapToMahaiak).FirstOrDefault()
+                    : null;
             }
         }
 
-       
-        // Mahai berria sortzea
-        public bool SortuMahaia(Mahaiak mahaia)
+        private static Mahaiak MapToMahaiak(MahaiaApiDto mahaia)
         {
-            using (var client = new HttpClient())
+            return new Mahaiak
             {
-                client.BaseAddress = new Uri(_baseUrl);
-
-                var json = JsonConvert.SerializeObject(mahaia);
-                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
-                var response = client.PostAsync("api/Mahaiak", content).Result;
-
-                return response.IsSuccessStatusCode;
-            }
+                Id = mahaia.Id,
+                Zenbakia = mahaia.Zenbakia,
+                Kapazitatea = mahaia.Kapazitatea,
+                Egoera = mahaia.Egoera
+            };
         }
 
-        
-        // Mahaia ezabatzea Id-aren arabera
-        public bool EzabatuMahaia(int id)
+        private class MahaiaApiDto
         {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(_baseUrl);
+            [JsonProperty("id")]
+            public int Id { get; set; }
 
-                var response = client.DeleteAsync($"api/Mahaiak/{id}").Result;
+            [JsonProperty("zenbakia")]
+            public int Zenbakia { get; set; }
 
-                return response.IsSuccessStatusCode;
-            }
+            [JsonProperty("kapazitatea")]
+            public int Kapazitatea { get; set; }
+
+            [JsonProperty("egoera")]
+            public string Egoera { get; set; }
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Taldea1TPV.Inbentarioa
 {
     internal class OsagaiakController
     {
-        private readonly string _baseUrl = "http://localhost:5000/";
+        private readonly string _baseUrl = "http://localhost:5093/";
 
         // API-tik osagai guztiak lortzea
         public List<Osagaiak> LortuOsagaiak()

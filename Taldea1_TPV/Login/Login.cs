@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using Taldea1TPV.Menua;
@@ -14,7 +14,6 @@ namespace Taldea1TPV
 
         private void Login_Load(object sender, EventArgs e)
         {
-            
         }
 
         private void btnSartu_Klik(object sender, EventArgs e)
@@ -23,9 +22,9 @@ namespace Taldea1TPV
             string pasahitza = txbPasa.Text.Trim();
 
             var login = new ErabiltzaileController();
-            bool loginBalidatu = login.BalidatuLogin(erabiltzailea, pasahitza);
+            var erabiltzaileLogeatua = login.BalidatuLogin(erabiltzailea, pasahitza);
 
-            if (loginBalidatu)
+            if (erabiltzaileLogeatua != null)
             {
                 MessageBox.Show(
                     "Ondo logeatu zara! Ongi etorri " + erabiltzailea,
@@ -34,7 +33,7 @@ namespace Taldea1TPV
                     MessageBoxIcon.Information
                 );
 
-                var menua = new MenuaForm(erabiltzailea);
+                var menua = new MenuaForm(erabiltzaileLogeatua);
                 menua.Show();
                 this.Hide();
             }
@@ -44,7 +43,5 @@ namespace Taldea1TPV
                 lblMezua.ForeColor = Color.Red;
             }
         }
-
-        
     }
 }

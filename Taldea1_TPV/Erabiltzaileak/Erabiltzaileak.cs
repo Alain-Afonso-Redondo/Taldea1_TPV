@@ -1,15 +1,22 @@
-﻿    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
+using Newtonsoft.Json;
 
-    namespace Taldea1TPV
+namespace Taldea1TPV
+{
+    public class Erabiltzaileak
     {
-        internal class Erabiltzaileak
-        {
-            public virtual int Id { get; set; }
-            public virtual string Izena { get; set; }
-            public virtual string Pasahitza { get; set; }
-        }
+        [JsonProperty("id")]
+        public virtual int Id { get; set; }
+
+        [JsonProperty("erabiltzailea")]
+        public virtual string Erabiltzailea { get; set; }
+
+        [JsonProperty("emaila")]
+        public virtual string Emaila { get; set; }
+
+        [JsonProperty("rola")]
+        public virtual string Rola { get; set; }
+
+        [JsonProperty("txat")]
+        public virtual bool Txat { get; set; }
     }
+}

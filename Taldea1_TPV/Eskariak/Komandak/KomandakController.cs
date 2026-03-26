@@ -1,112 +1,88 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Windows.Forms;
 using Newtonsoft.Json;
+using Taldea1TPV.DTO;
 
 namespace Taldea1TPV.Eskariak
 {
     internal class KomandakController
     {
-        private readonly string _baseUrl = "http://localhost:5000/";
+        private readonly string _baseUrl = ApiConfig.BaseUrl;
 
-        
-        // API-tik Komanda guztiak lortzea
         public List<Komandak> LortuKomandak()
         {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(_baseUrl);
-
-                
-                var response = client.GetAsync("api/Komandak").Result;
-
-                if (!response.IsSuccessStatusCode)
-                    return new List<Komandak>();
-
-                var json = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<List<Komandak>>(json);
-            }
+            return new List<Komandak>();
         }
 
-        
-        // Faktura baten Komandak lortzea
         public List<Komandak> LortuKomandakFakturatik(int fakturaId)
         {
+            return new List<Komandak>();
+        }
+
+        public bool SortuKomanda(int fakturaId, int platerId, int kopurua)
+        {
+            string errorea;
+            return SortuEskaera(
+                fakturaId,
+                0,
+                1,
+                new List<Karritoa>
+                {
+                    new Karritoa
+                    {
+                        PlaterakId = platerId,
+                        Kopurua = kopurua,
+                        Prezioa = 0
+                    }
+                },
+                out errorea);
+        }
+
+        public bool SortuEskaera(int erabiltzaileId, int mahaiaId, int komensalak, List<Karritoa> karritoa, out string errorea)
+        {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
-              
-                var response = client.GetAsync($"api/Komandak/faktura/{fakturaId}").Result;
-
-                if (!response.IsSuccessStatusCode)
-                    return new List<Komandak>();
-
-                var json = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<List<Komandak>>(json);
-            }
-        }
-
-
-        // Komanda berria sortzea
-        public bool SortuKomanda(int fakturaId, int platerId, int kopurua)
-        {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri("http://192.168.2.101:5000/");
-
-                var body = new
+                var body = new EskaeraSortuDto
                 {
-                    FakturakId = fakturaId,
-                    PlaterakId = platerId,
-                    Kopurua = kopurua
+                    ErabiltzaileId = erabiltzaileId,
+                    MahaiaId = mahaiaId,
+                    Komensalak = komensalak,
+                    Produktuak = karritoa.Select(k => new EskaeraProduktuaSortuDto
+                    {
+                        ProduktuaId = k.PlaterakId,
+                        Kantitatea = k.Kopurua,
+                        PrezioUnitarioa = Convert.ToDecimal(k.Prezioa)
+                    }).ToList()
                 };
 
                 var json = JsonConvert.SerializeObject(body);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = client.PostAsync("api/eskaerak", content).Result;
 
-                var response = client.PostAsync("api/Komandak", content).Result;
-                return response.IsSuccessStatusCode;
+                if (!response.IsSuccessStatusCode)
+                {
+                    errorea = response.Content.ReadAsStringAsync().Result;
+                    return false;
+                }
+
+                errorea = null;
+                return true;
             }
         }
 
-
-
-
-
-
-
-        // Komanda eguneratzea
         public bool EguneratuKomanda(Komandak komanda)
         {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(_baseUrl);
-
-                var json = JsonConvert.SerializeObject(komanda);
-                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
-                
-                var response = client.PutAsync($"api/Komandak/{komanda.Id}", content).Result;
-
-                return response.IsSuccessStatusCode;
-            }
+            return false;
         }
 
-        
-        // Komanda ezabatzea Id-aren arabera
         public bool EzabatuKomanda(int id)
         {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(_baseUrl);
-
-                var response = client.DeleteAsync($"api/Komandak/{id}").Result;
-
-                return response.IsSuccessStatusCode;
-            }
+            return false;
         }
     }
 }

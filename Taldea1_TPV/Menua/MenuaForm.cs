@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using System.Windows.Forms;
 using Taldea1TPV.Eskariak;
 using Taldea1TPV.Eskariak.Erreserbak;
@@ -15,11 +8,12 @@ namespace Taldea1TPV.Menua
 {
     public partial class MenuaForm : Form
     {
-        string erabiltzailea;
-        public MenuaForm(string erabiltzailea)
+        private readonly Erabiltzaileak _erabiltzailea;
+
+        public MenuaForm(Erabiltzaileak erabiltzailea)
         {
             InitializeComponent();
-            this.erabiltzailea = erabiltzailea; 
+            _erabiltzailea = erabiltzailea;
         }
 
         private void btnInbentarioa_Click(object sender, EventArgs e)
@@ -29,17 +23,12 @@ namespace Taldea1TPV.Menua
 
         private void btnEskaria_Click(object sender, EventArgs e)
         {
-            
-            new MahaiakForm(erabiltzailea).Show();
+            new MahaiakForm(_erabiltzailea).Show();
         }
 
         private void btnErreserba_Click(object sender, EventArgs e)
         {
-
             new ErreserbakForm().Show();
         }
-
     }
-
-
 }

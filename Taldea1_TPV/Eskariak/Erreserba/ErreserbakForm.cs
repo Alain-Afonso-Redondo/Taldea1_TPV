@@ -134,19 +134,11 @@ namespace Taldea1TPV.Eskariak.Erreserbak
 
             panel.Controls.Add(new Label
             {
-                Text = $"MAHAIA {mahai.MahaiZenbakia}",
+                Text = $"MAHAIA {mahai.Zenbakia}",
                 Font = new Font("Segoe UI", 14F, FontStyle.Bold),
                 Dock = DockStyle.Top,
                 Height = 30,
                 ForeColor = Color.FromArgb(29, 80, 91)
-            });
-
-            panel.Controls.Add(new Label
-            {
-                Text = $"{mahai.PertsonaMax} pertsona",
-                Font = new Font("Segoe UI", 10F),
-                Dock = DockStyle.Top,
-                ForeColor = Color.DimGray
             });
 
             return panel;

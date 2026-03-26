@@ -8,7 +8,7 @@ namespace Taldea1TPV.Eskariak
 {
     internal class ErreserbakController
     {
-        private readonly string _baseUrl = "http://localhost:5000/";
+        private readonly string _baseUrl = "http://localhost:5093/";
 
         
         // API-tik erreserba guztiak lortzea

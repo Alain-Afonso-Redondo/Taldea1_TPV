@@ -130,11 +130,11 @@ namespace Taldea1TPV.Eskariak
                 .Where(m =>
                     (!mahaiOkupatuak.Contains(m.Id) ||
                      (mantenduMahaiaEditatzen && m.Id == _mahaiEditatuaId)) &&
-                    m.PertsonaMax >= pertsonak)
+                    m.Kapazitatea >= pertsonak)
                 .ToList();
 
             cmbMahaiak.DataSource = libre;
-            cmbMahaiak.DisplayMember = "MahaiZenbakia";
+            cmbMahaiak.DisplayMember = "Zenbakia";
             cmbMahaiak.ValueMember = "Id";
 
             if (mantenduMahaiaEditatzen)

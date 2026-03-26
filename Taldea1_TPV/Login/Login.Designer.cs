@@ -18,7 +18,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Login));
             this.mainLayout = new System.Windows.Forms.TableLayoutPanel();
             this.centerLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.pboxLogo = new System.Windows.Forms.PictureBox();
             this.lblErab = new System.Windows.Forms.Label();
             this.txbErab = new System.Windows.Forms.TextBox();
             this.lblPasa = new System.Windows.Forms.Label();
@@ -27,7 +26,6 @@
             this.lblMezua = new System.Windows.Forms.Label();
             this.mainLayout.SuspendLayout();
             this.centerLayout.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pboxLogo)).BeginInit();
             this.SuspendLayout();
             // 
             // mainLayout
@@ -49,13 +47,12 @@
             // 
             this.centerLayout.ColumnCount = 1;
             this.centerLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 474F));
-            this.centerLayout.Controls.Add(this.pboxLogo, 0, 0);
-            this.centerLayout.Controls.Add(this.lblErab, 0, 1);
-            this.centerLayout.Controls.Add(this.txbErab, 0, 2);
-            this.centerLayout.Controls.Add(this.lblPasa, 0, 3);
-            this.centerLayout.Controls.Add(this.txbPasa, 0, 4);
-            this.centerLayout.Controls.Add(this.btnSartu, 0, 5);
-            this.centerLayout.Controls.Add(this.lblMezua, 0, 6);
+            this.centerLayout.Controls.Add(this.lblErab, 0, 0);
+            this.centerLayout.Controls.Add(this.txbErab, 0, 1);
+            this.centerLayout.Controls.Add(this.lblPasa, 0, 2);
+            this.centerLayout.Controls.Add(this.txbPasa, 0, 3);
+            this.centerLayout.Controls.Add(this.btnSartu, 0, 4);
+            this.centerLayout.Controls.Add(this.lblMezua, 0, 5);
             this.centerLayout.Dock = System.Windows.Forms.DockStyle.Fill;
             this.centerLayout.Location = new System.Drawing.Point(163, 3);
             this.centerLayout.Name = "centerLayout";
@@ -69,17 +66,6 @@
             this.centerLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.centerLayout.Size = new System.Drawing.Size(474, 444);
             this.centerLayout.TabIndex = 0;
-            // 
-            // pboxLogo
-            // 
-            this.pboxLogo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pboxLogo.Image = ((System.Drawing.Image)(resources.GetObject("pboxLogo.Image")));
-            this.pboxLogo.Location = new System.Drawing.Point(3, 3);
-            this.pboxLogo.Name = "pboxLogo";
-            this.pboxLogo.Size = new System.Drawing.Size(468, 117);
-            this.pboxLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pboxLogo.TabIndex = 0;
-            this.pboxLogo.TabStop = false;
             // 
             // lblErab
             // 
@@ -163,7 +149,6 @@
             this.mainLayout.ResumeLayout(false);
             this.centerLayout.ResumeLayout(false);
             this.centerLayout.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pboxLogo)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -172,7 +157,6 @@
 
         private System.Windows.Forms.TableLayoutPanel mainLayout;
         private System.Windows.Forms.TableLayoutPanel centerLayout;
-        private System.Windows.Forms.PictureBox pboxLogo;
         private System.Windows.Forms.Label lblErab;
         private System.Windows.Forms.TextBox txbErab;
         private System.Windows.Forms.Label lblPasa;
