@@ -41,8 +41,8 @@ namespace Taldea1TPV.Eskariak
                     Id = p.Id,
                     Izena = p.Izena,
                     Prezioa = p.Prezioa,
-                    Stock = p.Stock,
-                    KategoriaId = p.Kategoriak != null ? p.Kategoriak.Id : 0
+                    stock_aktuala = p.Stock,
+                    kategoria_id = p.Kategoriak != null ? p.Kategoriak.Id : 0
                 })
                 .ToList();
         }
@@ -82,7 +82,7 @@ namespace Taldea1TPV.Eskariak
             flpPlaterak.Controls.Clear();
 
             var platerak = _platerakCache
-                .Where(p => p.KategoriaId == kategoriaId)
+                .Where(p => p.kategoria_id == kategoriaId)
                 .ToList();
 
             foreach (var p in platerak)

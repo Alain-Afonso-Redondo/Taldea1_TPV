@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Taldea1TPV.DTO;
 
 namespace Taldea1TPV.Eskariak
@@ -63,16 +62,12 @@ namespace Taldea1TPV.Eskariak
 
         private class MahaiaApiDto
         {
-            [JsonProperty("id")]
             public int Id { get; set; }
 
-            [JsonProperty("zenbakia")]
             public int Zenbakia { get; set; }
 
-            [JsonProperty("kapazitatea")]
             public int Kapazitatea { get; set; }
 
-            [JsonProperty("egoera")]
             public string Egoera { get; set; }
         }
     }

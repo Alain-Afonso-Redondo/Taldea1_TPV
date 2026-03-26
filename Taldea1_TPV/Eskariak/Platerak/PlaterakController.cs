@@ -65,7 +65,7 @@ namespace Taldea1TPV.Eskariak
                 var erantzuna = JsonConvert.DeserializeObject<ApiErantzuna<PlaterakDto>>(json);
 
                 return erantzuna != null && erantzuna.Datuak != null
-                    ? erantzuna.Datuak.Where(p => p.KategoriaId == kategoriaId).ToList()
+                    ? erantzuna.Datuak.Where(p => p.kategoria_id == kategoriaId).ToList()
                     : new List<PlaterakDto>();
             }
         }
@@ -109,10 +109,10 @@ namespace Taldea1TPV.Eskariak
                 Id = platera.Id,
                 Izena = platera.Izena,
                 Prezioa = platera.Prezioa,
-                Stock = platera.Stock,
+                Stock = platera.stock_aktuala,
                 Kategoriak = new Kategoriak
                 {
-                    Id = platera.KategoriaId
+                    Id = platera.kategoria_id
                 }
             };
         }
