@@ -61,4 +61,24 @@ namespace Taldea1TPV
             }
         }
     }
+
+    internal class LoginErantzunaDto
+    {
+        public int Id { get; set; }
+
+        public string Erabiltzailea { get; set; }
+
+        public string Emaila { get; set; }
+
+        public LoginRolaDto Rola { get; set; }
+
+        public bool Txat { get; set; }
+    }
+
+    internal class LoginRolaDto
+    {
+        public int Id { get; set; }
+
+        public string Izena { get; set; }
+    }
 }

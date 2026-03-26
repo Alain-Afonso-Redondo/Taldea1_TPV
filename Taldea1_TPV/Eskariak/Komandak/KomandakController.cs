@@ -85,4 +85,19 @@ namespace Taldea1TPV.Eskariak
             return false;
         }
     }
+
+    internal class EskaeraSortuDto
+    {
+        public int ErabiltzaileId { get; set; }
+        public int MahaiaId { get; set; }
+        public int Komensalak { get; set; }
+        public List<EskaeraProduktuaSortuDto> Produktuak { get; set; }
+    }
+
+    internal class EskaeraProduktuaSortuDto
+    {
+        public int ProduktuaId { get; set; }
+        public int Kantitatea { get; set; }
+        public decimal PrezioUnitarioa { get; set; }
+    }
 }
