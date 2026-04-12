@@ -253,7 +253,7 @@ namespace Taldea1TPV.Eskariak
 
             if (!ok)
             {
-                MessageBox.Show("Errorea eskaera sortzean");
+                MessageBox.Show(string.IsNullOrWhiteSpace(errorea) ? "Errorea eskaera sortzean" : errorea);
                 return;
             }
 

@@ -11,6 +11,7 @@ namespace Taldea1TPV.Eskariak
     internal class KomandakController
     {
         private readonly string _baseUrl = ApiConfig.BaseUrl;
+        public string AzkenErrorea { get; private set; }
 
         public List<Komandak> LortuKomandak()
         {
@@ -63,15 +64,35 @@ namespace Taldea1TPV.Eskariak
                 var json = JsonConvert.SerializeObject(body);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var response = client.PostAsync("api/eskaerak", content).Result;
+                AzkenErrorea = null;
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    errorea = response.Content.ReadAsStringAsync().Result;
+                    errorea = IrakurriErrorea(response);
+                    AzkenErrorea = errorea;
                     return false;
                 }
 
                 errorea = null;
                 return true;
+            }
+        }
+
+        private static string IrakurriErrorea(HttpResponseMessage response)
+        {
+            try
+            {
+                var json = response.Content.ReadAsStringAsync().Result;
+                var erantzuna = JsonConvert.DeserializeObject<ApiErantzuna<string>>(json);
+
+                if (erantzuna != null && !string.IsNullOrWhiteSpace(erantzuna.Message))
+                    return erantzuna.Message;
+
+                return string.IsNullOrWhiteSpace(json) ? response.ReasonPhrase : json;
+            }
+            catch
+            {
+                return response.ReasonPhrase;
             }
         }
 
