@@ -221,17 +221,10 @@
     <Compile Include="Eskariak\Platerak\PlaterakController.cs" />
     <Compile Include="Eskariak\PlateraOsagaiak\PlateraOsagaiakController.cs" />
     <Compile Include="Eskariak\PlateraOsagaiak\PlateraOsagaiak.cs" />
-    <Compile Include="Inbentarioa\Osagaiak\OsagaiakController.cs" />
     <Compile Include="Inbentarioa\Osagaiak\Osagaiak.cs" />
     <Compile Include="Eskariak\Platerak\Platerak.cs" />
     <Compile Include="Eskariak\Komandak\Komandak.cs" />
     <Compile Include="Eskariak\Kategoriak\Kategoriak.cs" />
-    <Compile Include="Inbentarioa\InbentarioaForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Inbentarioa\InbentarioaForm.Designer.cs">
-      <DependentUpon>InbentarioaForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Menua\MenuaForm.cs">
       <SubType>Form</SubType>
     </Compile>
