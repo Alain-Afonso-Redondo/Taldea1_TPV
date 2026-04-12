@@ -42,7 +42,7 @@
             this.SuspendLayout();
 
             // ===== FORM =====
-            this.Text = "OSIS - Erreserba";
+            this.Text = "AJA - Erreserba";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.ClientSize = new System.Drawing.Size(900, 650);
             this.BackColor = System.Drawing.Color.FromArgb(245, 245, 245);

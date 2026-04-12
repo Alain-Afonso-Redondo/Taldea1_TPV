@@ -231,6 +231,12 @@ namespace Taldea1TPV.Eskariak
                 return;
             }
 
+            if (_hautatutakoErreserba == null)
+            {
+                MessageBox.Show("Mahaia ez dago erreserbatuta data eta txanda honetan");
+                return;
+            }
+
             var mahaiCtrl = new MahaiakController();
             var mahaia = mahaiCtrl.LortuMahaia(_mahaiHautatuaId.Value);
 
@@ -240,11 +246,9 @@ namespace Taldea1TPV.Eskariak
                 return;
             }
 
-            var komensalak = _hautatutakoErreserba != null
-                ? _hautatutakoErreserba.PertsonaKopurua
-                : mahaia.Kapazitatea;
+            var komensalak = _hautatutakoErreserba.PertsonaKopurua;
 
-            var f = new EskaerakForm(_erabiltzailea, mahaia.Id, komensalak, _hautatutakoErreserba != null ? (int?)_hautatutakoErreserba.Id : null);
+            var f = new EskaerakForm(_erabiltzailea, mahaia.Id, komensalak, _hautatutakoErreserba.Id);
             f.Show();
             this.Close();
         }

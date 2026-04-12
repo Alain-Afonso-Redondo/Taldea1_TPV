@@ -63,9 +63,9 @@ namespace Taldea1TPV.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Logo_Osis_Sales {
+        internal static System.Drawing.Bitmap Logo_AJA_Sales {
             get {
-                object obj = ResourceManager.GetObject("Logo_Osis_Sales", resourceCulture);
+                object obj = ResourceManager.GetObject("Logo_AJA_Sales", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

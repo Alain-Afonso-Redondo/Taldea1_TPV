@@ -97,7 +97,7 @@ namespace Taldea1TPV.Menua
             this.Controls.Add(this.mainLayout);
             this.Name = "MenuaForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "OSIS Menua";
+            this.Text = "AJA Menua";
             this.mainLayout.ResumeLayout(false);
             this.menuLayout.ResumeLayout(false);
             this.ResumeLayout(false);

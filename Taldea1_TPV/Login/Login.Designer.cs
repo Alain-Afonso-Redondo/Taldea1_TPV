@@ -144,7 +144,7 @@
             this.Controls.Add(this.mainLayout);
             this.Name = "Login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "OSIS TPV - Sarrera";
+            this.Text = "AJA TPV - Sarrera";
             this.Load += new System.EventHandler(this.Login_Load);
             this.mainLayout.ResumeLayout(false);
             this.centerLayout.ResumeLayout(false);

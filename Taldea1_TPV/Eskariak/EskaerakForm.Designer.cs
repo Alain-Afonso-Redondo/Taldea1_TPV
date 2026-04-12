@@ -30,7 +30,7 @@
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.MinimumSize = new System.Drawing.Size(1280, 800);
             this.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.Text = "OSIS TPV - Eskariak";
+            this.Text = "AJA TPV - Eskariak";
 
             // ================= HEADER =================
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
