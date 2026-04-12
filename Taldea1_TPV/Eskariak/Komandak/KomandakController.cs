@@ -30,6 +30,7 @@ namespace Taldea1TPV.Eskariak
                 fakturaId,
                 0,
                 1,
+                null,
                 new List<Karritoa>
                 {
                     new Karritoa
@@ -42,7 +43,7 @@ namespace Taldea1TPV.Eskariak
                 out errorea);
         }
 
-        public bool SortuEskaera(int erabiltzaileId, int mahaiaId, int komensalak, List<Karritoa> karritoa, out string errorea)
+        public bool SortuEskaera(int erabiltzaileId, int mahaiaId, int komensalak, int? erreserbaId, List<Karritoa> karritoa, out string errorea)
         {
             using (var client = new HttpClient())
             {
@@ -53,6 +54,7 @@ namespace Taldea1TPV.Eskariak
                     ErabiltzaileId = erabiltzaileId,
                     MahaiaId = mahaiaId,
                     Komensalak = komensalak,
+                    ErreserbaId = erreserbaId,
                     Produktuak = karritoa.Select(k => new EskaeraProduktuaSortuDto
                     {
                         ProduktuaId = k.PlaterakId,
@@ -112,6 +114,7 @@ namespace Taldea1TPV.Eskariak
         public int ErabiltzaileId { get; set; }
         public int MahaiaId { get; set; }
         public int Komensalak { get; set; }
+        public int? ErreserbaId { get; set; }
         public List<EskaeraProduktuaSortuDto> Produktuak { get; set; }
     }
 

@@ -12,16 +12,18 @@ namespace Taldea1TPV.Eskariak
         private readonly Erabiltzaileak _erabiltzailea;
         private readonly int _mahaiaId;
         private readonly int _komensalak;
+        private readonly int? _erreserbaId;
         private int? _aukeratutakoKategoriaId;
         private List<PlaterakDto> _platerakCache = new List<PlaterakDto>();
         private List<Karritoa> karritoa = new List<Karritoa>();
 
-        public EskaerakForm(Erabiltzaileak erabiltzailea, int mahaiaId, int komensalak)
+        public EskaerakForm(Erabiltzaileak erabiltzailea, int mahaiaId, int komensalak, int? erreserbaId = null)
         {
             InitializeComponent();
             _erabiltzailea = erabiltzailea;
             _mahaiaId = mahaiaId;
             _komensalak = komensalak;
+            _erreserbaId = erreserbaId;
         }
 
         private void EskaerakForm_Load(object sender, EventArgs e)
@@ -247,6 +249,7 @@ namespace Taldea1TPV.Eskariak
                 _erabiltzailea.Id,
                 _mahaiaId,
                 _komensalak,
+                _erreserbaId,
                 karritoa,
                 out errorea
             );

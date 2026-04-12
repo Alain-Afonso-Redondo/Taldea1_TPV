@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -14,6 +15,8 @@ namespace Taldea1TPV.Eskariak
         private bool hasieraEginda = false;
         private int? _mahaiHautatuaId = null;
         private string _txandaAukeratua = null;
+        private Erreserba _hautatutakoErreserba = null;
+        private System.Collections.Generic.List<Erreserba> _erreserbak = new System.Collections.Generic.List<Erreserba>();
 
         public MahaiakForm(Erabiltzaileak erabiltzailea)
         {
@@ -108,17 +111,24 @@ namespace Taldea1TPV.Eskariak
         {
             flpMahaiak.Controls.Clear();
             _mahaiHautatuaId = null;
+            _hautatutakoErreserba = null;
 
             if (_txandaAukeratua == null)
                 return;
 
             var mahaiCtrl = new MahaiakController();
+            var erreserbaCtrl = new ErreserbakController();
             var mahaiak = mahaiCtrl.LortuMahaiak();
+            _erreserbak = erreserbaCtrl
+                .LortuErreserbakData(dtimeData.Value.Date)
+                .Where(r => string.Equals(r.Txanda, _txandaAukeratua, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
             foreach (var mahai in mahaiak)
             {
                 var panel = mahaiaSortu(mahai);
-                panel.BackColor = mahai.Egoera == "okupatuta"
+                var erreserba = _erreserbak.FirstOrDefault(r => r.MahaiaId == mahai.Id);
+                panel.BackColor = erreserba != null
                     ? Color.FromArgb(255, 230, 230)
                     : Color.White;
                 panel.Cursor = Cursors.Hand;
@@ -128,13 +138,17 @@ namespace Taldea1TPV.Eskariak
                     foreach (Control c in flpMahaiak.Controls)
                     {
                         var kontrolMahaia = c.Tag as Mahaiak;
-                        c.BackColor = kontrolMahaia != null && kontrolMahaia.Egoera == "okupatuta"
+                        var kontrolErreserba = kontrolMahaia == null
+                            ? null
+                            : _erreserbak.FirstOrDefault(r => r.MahaiaId == kontrolMahaia.Id);
+                        c.BackColor = kontrolErreserba != null
                             ? Color.FromArgb(255, 230, 230)
                             : Color.White;
                     }
 
                     panel.BackColor = Color.FromArgb(220, 240, 225);
                     _mahaiHautatuaId = mahai.Id;
+                    _hautatutakoErreserba = erreserba;
                 };
 
                 panel.Tag = mahai;
@@ -144,6 +158,8 @@ namespace Taldea1TPV.Eskariak
 
         private Control mahaiaSortu(Mahaiak mahai)
         {
+            var erreserba = _erreserbak.FirstOrDefault(r => r.MahaiaId == mahai.Id);
+
             Panel p = new Panel
             {
                 Width = mahaiaZabalera,
@@ -177,16 +193,30 @@ namespace Taldea1TPV.Eskariak
 
             Label lblEgoera = new Label
             {
-                Text = (mahai.Egoera ?? "libre").ToUpper(),
+                Text = erreserba != null
+                    ? "ERRESERBATUTA"
+                    : "LIBRE",
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                ForeColor = mahai.Egoera == "okupatuta"
+                ForeColor = erreserba != null
                     ? Color.FromArgb(160, 40, 40)
                     : Color.FromArgb(28, 95, 43),
                 Dock = DockStyle.Bottom,
                 TextAlign = ContentAlignment.BottomRight
             };
 
+            Label lblData = new Label
+            {
+                Text = erreserba != null
+                    ? string.Format("{0:dd/MM/yyyy} - {1}", erreserba.Data, erreserba.Txanda)
+                    : string.Format("{0:dd/MM/yyyy} - {1}", dtimeData.Value.Date, _txandaAukeratua),
+                Font = new Font("Segoe UI", 8.5F),
+                ForeColor = Color.DimGray,
+                Dock = DockStyle.Bottom,
+                Height = 20
+            };
+
             p.Controls.Add(lblEgoera);
+            p.Controls.Add(lblData);
             p.Controls.Add(lblPertsonaMax);
             p.Controls.Add(lblMahaiZenbakia);
 
@@ -210,7 +240,11 @@ namespace Taldea1TPV.Eskariak
                 return;
             }
 
-            var f = new EskaerakForm(_erabiltzailea, mahaia.Id, mahaia.Kapazitatea);
+            var komensalak = _hautatutakoErreserba != null
+                ? _hautatutakoErreserba.PertsonaKopurua
+                : mahaia.Kapazitatea;
+
+            var f = new EskaerakForm(_erabiltzailea, mahaia.Id, komensalak, _hautatutakoErreserba != null ? (int?)_hautatutakoErreserba.Id : null);
             f.Show();
             this.Close();
         }
