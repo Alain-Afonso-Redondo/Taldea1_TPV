@@ -109,9 +109,8 @@ namespace Taldea1TPV.Eskariak
             var mahaiGuztiak = mahaiCtrl.LortuMahaiak();
 
             var erreserbakEguneko = erreserbaCtrl
-                .LortuErreserbak()
+                .LortuErreserbakData(dtpData.Value.Date)
                 .Where(e =>
-                    e.Data.Date == dtpData.Value.Date &&
                     e.Txanda == txandaAukeratua &&
                     (!_editatzen || e.Id != _erreserbaEditatzen.Id))
                 .ToList();
@@ -172,12 +171,28 @@ namespace Taldea1TPV.Eskariak
                 _erreserbaEditatzen.PertsonaKopurua = pertsonak;
                 _erreserbaEditatzen.Data = dtpData.Value.Date;
                 _erreserbaEditatzen.Txanda = txandaAukeratua;
+                _erreserbaEditatzen.MahaiaId = mahaiId;
 
-                erreserbaCtrl.EguneratuErreserba(_erreserbaEditatzen);
-                erreserbaMahaiCtrl.EguneratuMahaiErreserban(
+                var eguneratuta = erreserbaCtrl.EguneratuErreserba(_erreserbaEditatzen);
+                if (!eguneratuta)
+                {
+                    var mezua = string.IsNullOrWhiteSpace(erreserbaCtrl.AzkenErrorea)
+                        ? "Errorea erreserba eguneratzean"
+                        : erreserbaCtrl.AzkenErrorea;
+                    MessageBox.Show(mezua);
+                    return;
+                }
+
+                var mahaiaEguneratuta = erreserbaMahaiCtrl.EguneratuMahaiErreserban(
                     _erreserbaEditatzen.Id,
                     mahaiId
                 );
+
+                if (!mahaiaEguneratuta)
+                {
+                    MessageBox.Show("Errorea erreserbaren mahaia eguneratzean");
+                    return;
+                }
 
                 MessageBox.Show("Erreserba eguneratuta!");
                 Close();
@@ -191,18 +206,28 @@ namespace Taldea1TPV.Eskariak
                 Telefonoa = txtTelefonoa.Text.Trim(),
                 PertsonaKopurua = pertsonak,
                 Txanda = txandaAukeratua,
-                Data = dtpData.Value.Date
+                Data = dtpData.Value.Date,
+                MahaiaId = mahaiId,
+                Egoera = "sortua"
             };
 
             var sortua = erreserbaCtrl.SortuErreserba(erreserba);
 
             if (sortua == null)
             {
-                MessageBox.Show("Errorea erreserba sortzean");
+                var mezua = string.IsNullOrWhiteSpace(erreserbaCtrl.AzkenErrorea)
+                    ? "Errorea erreserba sortzean"
+                    : erreserbaCtrl.AzkenErrorea;
+                MessageBox.Show(mezua);
                 return;
             }
 
-            erreserbaMahaiCtrl.GehituMahaiErreserbara(sortua.Id, mahaiId);
+            var mahaiaGehituta = erreserbaMahaiCtrl.GehituMahaiErreserbara(sortua.Id, mahaiId);
+            if (!mahaiaGehituta)
+            {
+                MessageBox.Show("Erreserba sortu da baina mahaia ezin izan da lotu");
+                return;
+            }
 
             MessageBox.Show("Erreserba behar bezala sortu da!");
             Close();

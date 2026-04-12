@@ -1,16 +1,15 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
+using Taldea1TPV.DTO;
 
 namespace Taldea1TPV.Eskariak
 {
     public class ErreserbaMahaiController
     {
-        private readonly string _baseUrl = "http://localhost:5093/";
+        private readonly string _baseUrl = ApiConfig.BaseUrl;
 
         public bool GehituMahaiErreserbara(int erreserbaId, int mahaiId)
         {
@@ -25,12 +24,11 @@ namespace Taldea1TPV.Eskariak
                 };
 
                 var json = JsonConvert.SerializeObject(dto);
-                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var response = client.PostAsync("api/ErreserbaMahaiak", content).Result;
+
                 return response.IsSuccessStatusCode;
             }
-                
         }
 
         public List<int> LortuMahaiakErreserbarentzat(int erreserbaId)
@@ -38,16 +36,17 @@ namespace Taldea1TPV.Eskariak
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-
-                var response = client
-                    .GetAsync($"api/ErreserbaMahaiak/erreserba/{erreserbaId}")
-                    .Result;
+                var response = client.GetAsync($"api/ErreserbaMahaiak/erreserba/{erreserbaId}").Result;
 
                 if (!response.IsSuccessStatusCode)
                     return new List<int>();
 
                 var json = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<List<int>>(json);
+                var erantzuna = JsonConvert.DeserializeObject<ApiErantzuna<int>>(json);
+
+                return erantzuna != null && erantzuna.Datuak != null
+                    ? erantzuna.Datuak
+                    : new List<int>();
             }
         }
 
@@ -57,15 +56,10 @@ namespace Taldea1TPV.Eskariak
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
-                
-                var deleteResp = client.DeleteAsync(
-                    $"api/ErreserbaMahaiak/erreserba/{erreserbaId}"
-                ).Result;
-
+                var deleteResp = client.DeleteAsync($"api/ErreserbaMahaiak/erreserba/{erreserbaId}").Result;
                 if (!deleteResp.IsSuccessStatusCode)
                     return false;
 
-               
                 var dto = new ErreserbaMahai
                 {
                     ErreserbakId = erreserbaId,
@@ -74,8 +68,8 @@ namespace Taldea1TPV.Eskariak
 
                 var json = JsonConvert.SerializeObject(dto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-
                 var postResp = client.PostAsync("api/ErreserbaMahaiak", content).Result;
+
                 return postResp.IsSuccessStatusCode;
             }
         }
@@ -85,16 +79,10 @@ namespace Taldea1TPV.Eskariak
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-
-                var response = client.DeleteAsync(
-                    $"api/ErreserbaMahaiak/erreserba/{erreserbaId}"
-                ).Result;
+                var response = client.DeleteAsync($"api/ErreserbaMahaiak/erreserba/{erreserbaId}").Result;
 
                 return response.IsSuccessStatusCode;
             }
         }
-
-
-
     }
 }

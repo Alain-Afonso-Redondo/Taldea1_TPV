@@ -63,9 +63,8 @@ namespace Taldea1TPV.Eskariak.Erreserbak
             flpErreserbak.Controls.Clear();
 
             var ctrl = new ErreserbakController();
-            var erreserbak = ctrl.LortuErreserbak()
+            var erreserbak = ctrl.LortuErreserbakData(_dataAukeratua)
                 .Where(e =>
-                    e.Data.Date == _dataAukeratua &&
                     (_txandaAukeratua == null || e.Txanda == _txandaAukeratua))
                 .ToList();
 
@@ -85,9 +84,8 @@ namespace Taldea1TPV.Eskariak.Erreserbak
             var mahaiak = mahaiCtrl.LortuMahaiak();
 
             
-            var erreserbak = erreserbaCtrl.LortuErreserbak()
+            var erreserbak = erreserbaCtrl.LortuErreserbakData(_dataAukeratua)
                 .Where(e =>
-                    e.Data.Date == _dataAukeratua &&
                     (_txandaAukeratua == null || e.Txanda == _txandaAukeratua))
                 .ToList();
 
@@ -210,7 +208,9 @@ namespace Taldea1TPV.Eskariak.Erreserbak
 
         private void btnGehitu_Click(object sender, EventArgs e)
         {
-            new ErreserbatuForm().Show();
+            var f = new ErreserbatuForm();
+            f.FormClosed += (s, ev) => KargatuDena();
+            f.ShowDialog();
         }
 
         private void btnEditatu_Click(object sender, EventArgs e)
