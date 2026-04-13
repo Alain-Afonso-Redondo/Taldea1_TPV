@@ -11,12 +11,23 @@ namespace Taldea1TPV.Eskariak
     {
         private readonly string _baseUrl = ApiConfig.BaseUrl;
 
-        public List<Mahaiak> LortuMahaiak()
+        public List<Mahaiak> LortuMahaiak(DateTime? data = null, string txanda = null)
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-                var response = client.GetAsync("api/mahaiak").Result;
+                var url = "api/mahaiak";
+
+                if (data.HasValue)
+                {
+                    var txandaQuery = Uri.EscapeDataString(txanda ?? string.Empty);
+                    url += string.Format(
+                        "?data={0:yyyy-MM-dd}&txanda={1}",
+                        data.Value.Date,
+                        txandaQuery);
+                }
+
+                var response = client.GetAsync(url).Result;
 
                 if (!response.IsSuccessStatusCode)
                     return new List<Mahaiak>();
@@ -30,12 +41,23 @@ namespace Taldea1TPV.Eskariak
             }
         }
 
-        public Mahaiak LortuMahaia(int id)
+        public Mahaiak LortuMahaia(int id, DateTime? data = null, string txanda = null)
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-                var response = client.GetAsync(string.Format("api/mahaiak/{0}", id)).Result;
+                var url = string.Format("api/mahaiak/{0}", id);
+
+                if (data.HasValue)
+                {
+                    var txandaQuery = Uri.EscapeDataString(txanda ?? string.Empty);
+                    url += string.Format(
+                        "?data={0:yyyy-MM-dd}&txanda={1}",
+                        data.Value.Date,
+                        txandaQuery);
+                }
+
+                var response = client.GetAsync(url).Result;
 
                 if (!response.IsSuccessStatusCode)
                     return null;

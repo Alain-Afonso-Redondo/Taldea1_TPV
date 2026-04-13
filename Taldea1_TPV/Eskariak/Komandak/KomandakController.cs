@@ -13,12 +13,20 @@ namespace Taldea1TPV.Eskariak
         private readonly string _baseUrl = ApiConfig.BaseUrl;
         public string AzkenErrorea { get; private set; }
 
-        public EskaeraAktiboa LortuEskaeraAktiboaMahaika(int mahaiaId)
+        public EskaeraAktiboa LortuEskaeraAktiboaMahaika(int mahaiaId, DateTime? data = null, string txanda = null)
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-                var response = client.GetAsync($"api/eskaerak/mahaia/{mahaiaId}/aktiboa").Result;
+                var url = $"api/eskaerak/mahaia/{mahaiaId}/aktiboa";
+
+                if (data.HasValue)
+                {
+                    var txandaQuery = Uri.EscapeDataString(txanda ?? string.Empty);
+                    url += $"?data={data.Value:yyyy-MM-dd}&txanda={txandaQuery}";
+                }
+
+                var response = client.GetAsync(url).Result;
 
                 if (!response.IsSuccessStatusCode)
                     return null;
@@ -87,6 +95,8 @@ namespace Taldea1TPV.Eskariak
                 0,
                 1,
                 null,
+                DateTime.Today,
+                "Bazkaria",
                 new List<Karritoa>
                 {
                     new Karritoa
@@ -99,7 +109,15 @@ namespace Taldea1TPV.Eskariak
                 out errorea);
         }
 
-        public bool SortuEskaera(int erabiltzaileId, int mahaiaId, int komensalak, int? erreserbaId, List<Karritoa> karritoa, out string errorea)
+        public bool SortuEskaera(
+            int erabiltzaileId,
+            int mahaiaId,
+            int komensalak,
+            int? erreserbaId,
+            DateTime? data,
+            string txanda,
+            List<Karritoa> karritoa,
+            out string errorea)
         {
             using (var client = new HttpClient())
             {
@@ -111,6 +129,8 @@ namespace Taldea1TPV.Eskariak
                     MahaiaId = mahaiaId,
                     Komensalak = komensalak,
                     ErreserbaId = erreserbaId,
+                    Data = data?.Date,
+                    Txanda = txanda,
                     Produktuak = karritoa.Select(k => new EskaeraProduktuaSortuDto
                     {
                         ProduktuaId = k.PlaterakId,
@@ -204,6 +224,8 @@ namespace Taldea1TPV.Eskariak
         public int MahaiaId { get; set; }
         public int Komensalak { get; set; }
         public int? ErreserbaId { get; set; }
+        public DateTime? Data { get; set; }
+        public string Txanda { get; set; }
         public List<EskaeraProduktuaSortuDto> Produktuak { get; set; }
     }
 

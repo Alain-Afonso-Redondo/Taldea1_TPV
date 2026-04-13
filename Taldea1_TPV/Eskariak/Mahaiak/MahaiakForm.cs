@@ -118,7 +118,7 @@ namespace Taldea1TPV.Eskariak
 
             var mahaiCtrl = new MahaiakController();
             var erreserbaCtrl = new ErreserbakController();
-            var mahaiak = mahaiCtrl.LortuMahaiak();
+            var mahaiak = mahaiCtrl.LortuMahaiak(dtimeData.Value.Date, _txandaAukeratua);
             _erreserbak = erreserbaCtrl
                 .LortuErreserbakData(dtimeData.Value.Date)
                 .Where(r => string.Equals(r.Txanda, _txandaAukeratua, StringComparison.OrdinalIgnoreCase))
@@ -128,12 +128,10 @@ namespace Taldea1TPV.Eskariak
             {
                 var panel = mahaiaSortu(mahai);
                 var erreserba = _erreserbak.FirstOrDefault(r => r.MahaiaId == mahai.Id);
-                panel.BackColor = erreserba != null
-                    ? Color.FromArgb(255, 230, 230)
-                    : Color.White;
+                panel.BackColor = LortuMahaiaKolorea(mahai, erreserba);
                 panel.Cursor = Cursors.Hand;
 
-                panel.Click += (s, e) =>
+                void hautatuMahaia(object s, EventArgs e)
                 {
                     foreach (Control c in flpMahaiak.Controls)
                     {
@@ -141,19 +139,38 @@ namespace Taldea1TPV.Eskariak
                         var kontrolErreserba = kontrolMahaia == null
                             ? null
                             : _erreserbak.FirstOrDefault(r => r.MahaiaId == kontrolMahaia.Id);
-                        c.BackColor = kontrolErreserba != null
-                            ? Color.FromArgb(255, 230, 230)
-                            : Color.White;
+                        c.BackColor = kontrolMahaia == null
+                            ? Color.White
+                            : LortuMahaiaKolorea(kontrolMahaia, kontrolErreserba);
                     }
 
                     panel.BackColor = Color.FromArgb(220, 240, 225);
                     _mahaiHautatuaId = mahai.Id;
                     _hautatutakoErreserba = erreserba;
-                };
+                }
+
+                panel.Click += hautatuMahaia;
+
+                foreach (Control child in panel.Controls)
+                {
+                    child.Cursor = Cursors.Hand;
+                    child.Click += hautatuMahaia;
+                }
 
                 panel.Tag = mahai;
                 flpMahaiak.Controls.Add(panel);
             }
+        }
+
+        private Color LortuMahaiaKolorea(Mahaiak mahai, Erreserba erreserba)
+        {
+            if (string.Equals(mahai.Egoera, "okupatuta", StringComparison.OrdinalIgnoreCase))
+                return Color.FromArgb(255, 241, 224);
+
+            if (erreserba != null)
+                return Color.FromArgb(255, 230, 230);
+
+            return Color.White;
         }
 
         private Control mahaiaSortu(Mahaiak mahai)
@@ -193,13 +210,9 @@ namespace Taldea1TPV.Eskariak
 
             Label lblEgoera = new Label
             {
-                Text = erreserba != null
-                    ? "ERRESERBATUTA"
-                    : "LIBRE",
+                Text = LortuMahaiaEgoeraTestua(mahai, erreserba),
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                ForeColor = erreserba != null
-                    ? Color.FromArgb(160, 40, 40)
-                    : Color.FromArgb(28, 95, 43),
+                ForeColor = LortuMahaiaEgoeraKolorea(mahai, erreserba),
                 Dock = DockStyle.Bottom,
                 TextAlign = ContentAlignment.BottomRight
             };
@@ -223,6 +236,31 @@ namespace Taldea1TPV.Eskariak
             return p;
         }
 
+        private string LortuMahaiaEgoeraTestua(Mahaiak mahai, Erreserba erreserba)
+        {
+            if (string.Equals(mahai.Egoera, "okupatuta", StringComparison.OrdinalIgnoreCase) && erreserba != null)
+                return "ERRESERBATUTA / OKUPATUTA";
+
+            if (string.Equals(mahai.Egoera, "okupatuta", StringComparison.OrdinalIgnoreCase))
+                return "OKUPATUTA";
+
+            if (erreserba != null)
+                return "ERRESERBATUTA";
+
+            return "LIBRE";
+        }
+
+        private Color LortuMahaiaEgoeraKolorea(Mahaiak mahai, Erreserba erreserba)
+        {
+            if (string.Equals(mahai.Egoera, "okupatuta", StringComparison.OrdinalIgnoreCase))
+                return Color.FromArgb(184, 90, 24);
+
+            if (erreserba != null)
+                return Color.FromArgb(160, 40, 40);
+
+            return Color.FromArgb(28, 95, 43);
+        }
+
         private void btnAukeratu_Click(object sender, EventArgs e)
         {
             if (_mahaiHautatuaId == null || _txandaAukeratua == null)
@@ -232,7 +270,7 @@ namespace Taldea1TPV.Eskariak
             }
 
             var mahaiCtrl = new MahaiakController();
-            var mahaia = mahaiCtrl.LortuMahaia(_mahaiHautatuaId.Value);
+            var mahaia = mahaiCtrl.LortuMahaia(_mahaiHautatuaId.Value, dtimeData.Value.Date, _txandaAukeratua);
 
             if (mahaia == null)
             {
@@ -248,7 +286,9 @@ namespace Taldea1TPV.Eskariak
                 _erabiltzailea,
                 mahaia.Id,
                 komensalak,
-                _hautatutakoErreserba?.Id);
+                _hautatutakoErreserba?.Id,
+                dtimeData.Value.Date,
+                _txandaAukeratua);
             f.Show();
             this.Close();
         }

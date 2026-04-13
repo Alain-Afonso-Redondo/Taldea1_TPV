@@ -13,18 +13,28 @@ namespace Taldea1TPV.Eskariak
         private readonly int _mahaiaId;
         private int _komensalak;
         private readonly int? _erreserbaId;
+        private readonly DateTime _data;
+        private readonly string _txanda;
         private int? _eskaeraId;
         private int? _aukeratutakoKategoriaId;
         private List<PlaterakDto> _platerakCache = new List<PlaterakDto>();
         private List<Karritoa> karritoa = new List<Karritoa>();
 
-        public EskaerakForm(Erabiltzaileak erabiltzailea, int mahaiaId, int komensalak, int? erreserbaId = null)
+        public EskaerakForm(
+            Erabiltzaileak erabiltzailea,
+            int mahaiaId,
+            int komensalak,
+            int? erreserbaId = null,
+            DateTime? data = null,
+            string txanda = null)
         {
             InitializeComponent();
             _erabiltzailea = erabiltzailea;
             _mahaiaId = mahaiaId;
             _komensalak = komensalak;
             _erreserbaId = erreserbaId;
+            _data = (data ?? DateTime.Today).Date;
+            _txanda = string.IsNullOrWhiteSpace(txanda) ? "Bazkaria" : txanda;
         }
 
         private void EskaerakForm_Load(object sender, EventArgs e)
@@ -38,11 +48,13 @@ namespace Taldea1TPV.Eskariak
         private void kargatuEskaeraAktiboa()
         {
             var komandaController = new KomandakController();
-            var eskaeraAktiboa = komandaController.LortuEskaeraAktiboaMahaika(_mahaiaId);
+            var eskaeraAktiboa = komandaController.LortuEskaeraAktiboaMahaika(_mahaiaId, _data, _txanda);
 
             if (eskaeraAktiboa == null)
             {
                 _eskaeraId = null;
+                karritoa = new List<Karritoa>();
+                eguneratuKarritoa();
                 return;
             }
 
@@ -273,6 +285,8 @@ namespace Taldea1TPV.Eskariak
                     _mahaiaId,
                     _komensalak,
                     _erreserbaId,
+                    _data,
+                    _txanda,
                     karritoa,
                     out errorea
                 );
