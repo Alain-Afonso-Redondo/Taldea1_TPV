@@ -11,8 +11,9 @@ namespace Taldea1TPV.Eskariak
     {
         private readonly Erabiltzaileak _erabiltzailea;
         private readonly int _mahaiaId;
-        private readonly int _komensalak;
+        private int _komensalak;
         private readonly int? _erreserbaId;
+        private int? _eskaeraId;
         private int? _aukeratutakoKategoriaId;
         private List<PlaterakDto> _platerakCache = new List<PlaterakDto>();
         private List<Karritoa> karritoa = new List<Karritoa>();
@@ -31,6 +32,26 @@ namespace Taldea1TPV.Eskariak
             lblErabiltzailea.Text = "Erabiltzailea: " + _erabiltzailea.Erabiltzailea;
             kargatuPlaterakCache();
             kargatuKategoriak();
+            kargatuEskaeraAktiboa();
+        }
+
+        private void kargatuEskaeraAktiboa()
+        {
+            var komandaController = new KomandakController();
+            var eskaeraAktiboa = komandaController.LortuEskaeraAktiboaMahaika(_mahaiaId);
+
+            if (eskaeraAktiboa == null)
+            {
+                _eskaeraId = null;
+                return;
+            }
+
+            _eskaeraId = eskaeraAktiboa.Id;
+            _komensalak = eskaeraAktiboa.Komensalak > 0
+                ? eskaeraAktiboa.Komensalak
+                : _komensalak;
+            karritoa = komandaController.LortuEskaeraProduktuak(eskaeraAktiboa.Id);
+            eguneratuKarritoa();
         }
 
         private void kargatuPlaterakCache()
@@ -245,14 +266,16 @@ namespace Taldea1TPV.Eskariak
 
             var komandaController = new KomandakController();
             string errorea;
-            bool ok = komandaController.SortuEskaera(
-                _erabiltzailea.Id,
-                _mahaiaId,
-                _komensalak,
-                _erreserbaId,
-                karritoa,
-                out errorea
-            );
+            bool ok = _eskaeraId.HasValue
+                ? komandaController.EguneratuEskaera(_eskaeraId.Value, _komensalak, karritoa, out errorea)
+                : komandaController.SortuEskaera(
+                    _erabiltzailea.Id,
+                    _mahaiaId,
+                    _komensalak,
+                    _erreserbaId,
+                    karritoa,
+                    out errorea
+                );
 
             if (!ok)
             {
@@ -261,12 +284,9 @@ namespace Taldea1TPV.Eskariak
             }
 
             MessageBox.Show("Komanda behar bezala eginda");
-
-            karritoa.Clear();
-            eguneratuKarritoa();
-            flpPlaterak.Controls.Clear();
             kargatuPlaterakCache();
             freskatuUnekoKategoria();
+            kargatuEskaeraAktiboa();
         }
 
         private void freskatuUnekoKategoria()

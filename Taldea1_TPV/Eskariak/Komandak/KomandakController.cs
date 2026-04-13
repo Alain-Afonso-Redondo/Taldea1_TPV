@@ -13,6 +13,62 @@ namespace Taldea1TPV.Eskariak
         private readonly string _baseUrl = ApiConfig.BaseUrl;
         public string AzkenErrorea { get; private set; }
 
+        public EskaeraAktiboa LortuEskaeraAktiboaMahaika(int mahaiaId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(_baseUrl);
+                var response = client.GetAsync($"api/eskaerak/mahaia/{mahaiaId}/aktiboa").Result;
+
+                if (!response.IsSuccessStatusCode)
+                    return null;
+
+                var json = response.Content.ReadAsStringAsync().Result;
+                var erantzuna = JsonConvert.DeserializeObject<ApiErantzuna<EskaeraAktiboaDto>>(json);
+                var dto = erantzuna != null && erantzuna.Datuak != null
+                    ? erantzuna.Datuak.FirstOrDefault()
+                    : null;
+
+                if (dto == null)
+                    return null;
+
+                return new EskaeraAktiboa
+                {
+                    Id = dto.Id,
+                    MahaiaId = dto.MahaiaId,
+                    Komensalak = dto.Komensalak
+                };
+            }
+        }
+
+        public List<Karritoa> LortuEskaeraProduktuak(int eskaeraId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(_baseUrl);
+                var response = client.GetAsync($"api/eskaerak/{eskaeraId}/produktuak").Result;
+
+                if (!response.IsSuccessStatusCode)
+                    return new List<Karritoa>();
+
+                var json = response.Content.ReadAsStringAsync().Result;
+                var erantzuna = JsonConvert.DeserializeObject<ApiErantzuna<EskaeraProduktuaLortuDto>>(json);
+
+                return erantzuna != null && erantzuna.Datuak != null
+                    ? erantzuna.Datuak
+                        .GroupBy(p => new { p.ProduktuaId, p.ProduktuaIzena, p.PrezioUnitarioa })
+                        .Select(g => new Karritoa
+                        {
+                            PlaterakId = g.Key.ProduktuaId,
+                            Izena = g.Key.ProduktuaIzena,
+                            Prezioa = Convert.ToDouble(g.Key.PrezioUnitarioa),
+                            Kopurua = g.Sum(x => x.Kantitatea)
+                        })
+                        .ToList()
+                    : new List<Karritoa>();
+            }
+        }
+
         public List<Komandak> LortuKomandak()
         {
             return new List<Komandak>();
@@ -80,6 +136,39 @@ namespace Taldea1TPV.Eskariak
             }
         }
 
+        public bool EguneratuEskaera(int eskaeraId, int komensalak, List<Karritoa> karritoa, out string errorea)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(_baseUrl);
+
+                var body = new EskaeraEguneratuDto
+                {
+                    Komensalak = komensalak,
+                    Produktuak = karritoa.Select(k => new EskaeraProduktuaEditatuDto
+                    {
+                        ProduktuaId = k.PlaterakId,
+                        Kantitatea = k.Kopurua
+                    }).ToList()
+                };
+
+                var json = JsonConvert.SerializeObject(body);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = client.PutAsync($"api/eskaerak/{eskaeraId}", content).Result;
+                AzkenErrorea = null;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    errorea = IrakurriErrorea(response);
+                    AzkenErrorea = errorea;
+                    return false;
+                }
+
+                errorea = null;
+                return true;
+            }
+        }
+
         private static string IrakurriErrorea(HttpResponseMessage response)
         {
             try
@@ -123,5 +212,39 @@ namespace Taldea1TPV.Eskariak
         public int ProduktuaId { get; set; }
         public int Kantitatea { get; set; }
         public decimal PrezioUnitarioa { get; set; }
+    }
+
+    internal class EskaeraEguneratuDto
+    {
+        public int Komensalak { get; set; }
+        public List<EskaeraProduktuaEditatuDto> Produktuak { get; set; }
+    }
+
+    internal class EskaeraProduktuaEditatuDto
+    {
+        public int ProduktuaId { get; set; }
+        public int Kantitatea { get; set; }
+    }
+
+    internal class EskaeraAktiboa
+    {
+        public int Id { get; set; }
+        public int MahaiaId { get; set; }
+        public int Komensalak { get; set; }
+    }
+
+    internal class EskaeraAktiboaDto
+    {
+        public int Id { get; set; }
+        public int MahaiaId { get; set; }
+        public int Komensalak { get; set; }
+    }
+
+    internal class EskaeraProduktuaLortuDto
+    {
+        public int ProduktuaId { get; set; }
+        public string ProduktuaIzena { get; set; }
+        public decimal PrezioUnitarioa { get; set; }
+        public int Kantitatea { get; set; }
     }
 }

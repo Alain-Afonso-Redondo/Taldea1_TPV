@@ -240,12 +240,6 @@ namespace Taldea1TPV.Eskariak
                 return;
             }
 
-            if (!string.Equals(mahaia.Egoera, "libre", StringComparison.OrdinalIgnoreCase))
-            {
-                MessageBox.Show("Mahaia ez dago libre une honetan");
-                return;
-            }
-
             var komensalak = _hautatutakoErreserba != null
                 ? _hautatutakoErreserba.PertsonaKopurua
                 : mahaia.Kapazitatea;
