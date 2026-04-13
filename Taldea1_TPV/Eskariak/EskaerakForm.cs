@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Diagnostics;
 using System.Windows.Forms;
 using Taldea1TPV.DTO;
 
@@ -55,6 +56,7 @@ namespace Taldea1TPV.Eskariak
                 _eskaeraId = null;
                 karritoa = new List<Karritoa>();
                 eguneratuKarritoa();
+                EguneratuFakturaBotoiak();
                 return;
             }
 
@@ -64,6 +66,7 @@ namespace Taldea1TPV.Eskariak
                 : _komensalak;
             karritoa = komandaController.LortuEskaeraProduktuak(eskaeraAktiboa.Id);
             eguneratuKarritoa();
+            EguneratuFakturaBotoiak();
         }
 
         private void kargatuPlaterakCache()
@@ -266,6 +269,14 @@ namespace Taldea1TPV.Eskariak
             }
 
             lblTotala.Text = "Totala: " + karritoa.Sum(c => c.Totala).ToString("0.00") + " EUR";
+            EguneratuFakturaBotoiak();
+        }
+
+        private void EguneratuFakturaBotoiak()
+        {
+            var badagoEskaera = _eskaeraId.HasValue;
+            btnItxiFaktura.Enabled = badagoEskaera;
+            btnSortuTiket.Enabled = badagoEskaera;
         }
 
         private void btnEskatu_Klik(object sender, EventArgs e)
@@ -300,6 +311,95 @@ namespace Taldea1TPV.Eskariak
             MessageBox.Show("Komanda behar bezala eginda");
             kargatuPlaterakCache();
             freskatuUnekoKategoria();
+            kargatuEskaeraAktiboa();
+        }
+
+        private void btnItxiFaktura_Click(object sender, EventArgs e)
+        {
+            if (!_eskaeraId.HasValue)
+            {
+                MessageBox.Show("Mahai honek ez dauka eskaera aktiborik.");
+                return;
+            }
+
+            var baieztatu = MessageBox.Show(
+                "Mahai honetako faktura ordainketara bidali nahi duzu?",
+                "Itxi faktura",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (baieztatu != DialogResult.Yes)
+                return;
+
+            var komandaController = new KomandakController();
+            string errorea;
+
+            if (!komandaController.OrdaintzeraBidali(_eskaeraId.Value, out errorea))
+            {
+                MessageBox.Show(
+                    string.IsNullOrWhiteSpace(errorea) ? "Ezin izan da faktura itxi." : errorea,
+                    "Errorea",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            MessageBox.Show(
+                "Faktura ordainketara bidali da.",
+                "Ondo",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
+        private void btnSortuTiket_Click(object sender, EventArgs e)
+        {
+            if (!_eskaeraId.HasValue)
+            {
+                MessageBox.Show("Mahai honek ez dauka eskaera aktiborik.");
+                return;
+            }
+
+            var baieztatu = MessageBox.Show(
+                "Mahai honetako tiketa sortu nahi duzu?",
+                "Sortu tiketa",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (baieztatu != DialogResult.Yes)
+                return;
+
+            var komandaController = new KomandakController();
+            string errorea;
+            var pdfBidea = komandaController.SortuFaktura(_eskaeraId.Value, out errorea);
+
+            if (string.IsNullOrWhiteSpace(pdfBidea))
+            {
+                MessageBox.Show(
+                    string.IsNullOrWhiteSpace(errorea) ? "Ezin izan da tiketa sortu." : errorea,
+                    "Errorea",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            MessageBox.Show(
+                "Tiketa ondo sortu da.\n" + pdfBidea,
+                "Ondo",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = pdfBidea,
+                    UseShellExecute = true
+                });
+            }
+            catch
+            {
+            }
+
             kargatuEskaeraAktiboa();
         }
 

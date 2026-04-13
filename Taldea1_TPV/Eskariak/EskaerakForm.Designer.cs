@@ -23,6 +23,8 @@
             this.grpKarritoa = new System.Windows.Forms.GroupBox();
             this.flpKarritoa = new System.Windows.Forms.FlowLayoutPanel();
             this.lblTotala = new System.Windows.Forms.Label();
+            this.btnSortuTiket = new System.Windows.Forms.Button();
+            this.btnItxiFaktura = new System.Windows.Forms.Button();
             this.btnEskatu = new System.Windows.Forms.Button();
 
             // ================= FORM =================
@@ -98,8 +100,28 @@
             this.btnEskatu.Text = "ESKATU";
             this.btnEskatu.Click += new System.EventHandler(this.btnEskatu_Klik);
 
+            this.btnSortuTiket.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.btnSortuTiket.Height = 45;
+            this.btnSortuTiket.BackColor = System.Drawing.Color.FromArgb(29, 80, 91);
+            this.btnSortuTiket.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSortuTiket.FlatAppearance.BorderSize = 0;
+            this.btnSortuTiket.ForeColor = System.Drawing.Color.White;
+            this.btnSortuTiket.Text = "SORTU TIKETA";
+            this.btnSortuTiket.Click += new System.EventHandler(this.btnSortuTiket_Click);
+
+            this.btnItxiFaktura.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.btnItxiFaktura.Height = 45;
+            this.btnItxiFaktura.BackColor = System.Drawing.Color.FromArgb(31, 107, 58);
+            this.btnItxiFaktura.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnItxiFaktura.FlatAppearance.BorderSize = 0;
+            this.btnItxiFaktura.ForeColor = System.Drawing.Color.White;
+            this.btnItxiFaktura.Text = "ITXI FAKTURA";
+            this.btnItxiFaktura.Click += new System.EventHandler(this.btnItxiFaktura_Click);
+
             this.grpKarritoa.Controls.Add(this.flpKarritoa);
             this.grpKarritoa.Controls.Add(this.lblTotala);
+            this.grpKarritoa.Controls.Add(this.btnSortuTiket);
+            this.grpKarritoa.Controls.Add(this.btnItxiFaktura);
             this.grpKarritoa.Controls.Add(this.btnEskatu);
 
             // ================= CONTROLS =================
@@ -122,6 +144,8 @@
         private System.Windows.Forms.GroupBox grpKarritoa;
         private System.Windows.Forms.FlowLayoutPanel flpKarritoa;
         private System.Windows.Forms.Label lblTotala;
+        private System.Windows.Forms.Button btnSortuTiket;
+        private System.Windows.Forms.Button btnItxiFaktura;
         private System.Windows.Forms.Button btnEskatu;
     }
 }

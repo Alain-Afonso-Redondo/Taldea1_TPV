@@ -189,6 +189,54 @@ namespace Taldea1TPV.Eskariak
             }
         }
 
+        public bool OrdaintzeraBidali(int eskaeraId, out string errorea)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(_baseUrl);
+
+                var response = client.PostAsync($"api/eskaerak/{eskaeraId}/ordainduEskaera", null).Result;
+                AzkenErrorea = null;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    errorea = IrakurriErrorea(response);
+                    AzkenErrorea = errorea;
+                    return false;
+                }
+
+                errorea = null;
+                return true;
+            }
+        }
+
+        public string SortuFaktura(int eskaeraId, out string errorea)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(_baseUrl);
+
+                var response = client.PostAsync($"api/eskaerak/{eskaeraId}/sortuFaktura", null).Result;
+                AzkenErrorea = null;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    errorea = IrakurriErrorea(response);
+                    AzkenErrorea = errorea;
+                    return null;
+                }
+
+                var json = response.Content.ReadAsStringAsync().Result;
+                var erantzuna = JsonConvert.DeserializeObject<ApiErantzuna<string>>(json);
+                var path = erantzuna != null && erantzuna.Datuak != null
+                    ? erantzuna.Datuak.FirstOrDefault()
+                    : null;
+
+                errorea = null;
+                return path;
+            }
+        }
+
         private static string IrakurriErrorea(HttpResponseMessage response)
         {
             try
