@@ -244,7 +244,7 @@ namespace Taldea1TPV.Eskariak
             if (string.Equals(mahai.Egoera, "okupatuta", StringComparison.OrdinalIgnoreCase))
                 return "OKUPATUTA";
 
-            if (erreserba != null)
+            if (erreserba != null && erreserba.Egoera != "amaituta")
                 return "ERRESERBATUTA";
 
             return "LIBRE";

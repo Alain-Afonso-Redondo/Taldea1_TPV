@@ -30,7 +30,7 @@ namespace Taldea1TPV
         {
             try
             {
-                erabiltzailea = new TcpClient("192.168.2.101", 5555);
+                erabiltzailea = new TcpClient("localhost", 5555);
                 var ns = erabiltzailea.GetStream();
 
                 irakurlea = new StreamReader(ns);
