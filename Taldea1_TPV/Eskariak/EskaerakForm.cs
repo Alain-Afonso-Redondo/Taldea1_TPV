@@ -152,7 +152,7 @@ namespace Taldea1TPV.Eskariak
 
                 Label lblStock = new Label
                 {
-                    Text = "Prest erabilgarri",
+                    Text = "Stock: "+ p.stock_aktuala.ToString(),
                     Location = new Point(10, 60),
                     Size = new Size(160, 18)
                 };
