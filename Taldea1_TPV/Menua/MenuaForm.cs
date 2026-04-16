@@ -13,6 +13,8 @@ namespace Taldea1TPV.Menua
         {
             InitializeComponent();
             _erabiltzailea = erabiltzailea;
+            Saioa.UnekoErabiltzailea = erabiltzailea;
+            TxatBotoiaLaguntzailea.Erantsi(this);
         }
 
         private void btnEskaria_Click(object sender, EventArgs e)

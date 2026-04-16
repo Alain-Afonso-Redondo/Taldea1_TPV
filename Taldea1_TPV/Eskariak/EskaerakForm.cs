@@ -411,7 +411,7 @@ namespace Taldea1TPV.Eskariak
 
         private void btnTxat_Click(object sender, EventArgs e)
         {
-            new TxatForm(_erabiltzailea.Erabiltzailea).Show();
+            TxatBotoiaLaguntzailea.IrekiTxata(this);
         }
     }
 }

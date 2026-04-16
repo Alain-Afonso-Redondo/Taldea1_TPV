@@ -15,6 +15,7 @@ namespace Taldea1TPV.Eskariak.Erreserbak
         public ErreserbakForm()
         {
             InitializeComponent();
+            TxatBotoiaLaguntzailea.Erantsi(this);
 
             
             flpErreserbak.FlowDirection = FlowDirection.TopDown;

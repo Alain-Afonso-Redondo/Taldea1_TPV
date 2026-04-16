@@ -22,6 +22,7 @@ namespace Taldea1TPV.Eskariak
         {
             InitializeComponent();
             _erabiltzailea = erabiltzailea;
+            TxatBotoiaLaguntzailea.Erantsi(this);
         }
 
         private void MahaiakForm_Load(object sender, EventArgs e)
@@ -278,9 +279,29 @@ namespace Taldea1TPV.Eskariak
                 return;
             }
 
-            var komensalak = _hautatutakoErreserba != null
-                ? _hautatutakoErreserba.PertsonaKopurua
-                : mahaia.Kapazitatea;
+            var komandaCtrl = new KomandakController();
+            var eskaeraAktiboa = komandaCtrl.LortuEskaeraAktiboaMahaika(
+                mahaia.Id,
+                dtimeData.Value.Date,
+                _txandaAukeratua);
+
+            int komensalak;
+            if (_hautatutakoErreserba != null)
+            {
+                komensalak = _hautatutakoErreserba.PertsonaKopurua;
+            }
+            else if (eskaeraAktiboa != null && eskaeraAktiboa.Komensalak > 0)
+            {
+                komensalak = eskaeraAktiboa.Komensalak;
+            }
+            else
+            {
+                var komensalakAukeratuta = EskatuKomensalak(mahaia);
+                if (!komensalakAukeratuta.HasValue)
+                    return;
+
+                komensalak = komensalakAukeratuta.Value;
+            }
 
             var f = new EskaerakForm(
                 _erabiltzailea,
@@ -291,6 +312,78 @@ namespace Taldea1TPV.Eskariak
                 _txandaAukeratua);
             f.Show();
             this.Close();
+        }
+
+        private int? EskatuKomensalak(Mahaiak mahaia)
+        {
+            if (mahaia.Kapazitatea <= 0)
+            {
+                MessageBox.Show("Mahaia honek ez dauka kapazitaterik esleituta.");
+                return null;
+            }
+
+            using (Form elkarrizketa = new Form())
+            {
+                elkarrizketa.Text = string.Format("Mahaia {0} - Komensalak", mahaia.Zenbakia);
+                elkarrizketa.StartPosition = FormStartPosition.CenterParent;
+                elkarrizketa.FormBorderStyle = FormBorderStyle.FixedDialog;
+                elkarrizketa.MinimizeBox = false;
+                elkarrizketa.MaximizeBox = false;
+                elkarrizketa.ClientSize = new Size(350, 150);
+
+                Label lbl = new Label
+                {
+                    AutoSize = false,
+                    Left = 16,
+                    Top = 16,
+                    Width = 318,
+                    Height = 40,
+                    Text = string.Format(
+                        "Mahaia ez dago erreserbatuta. Zenbat komensal dira? (1 - {0})",
+                        mahaia.Kapazitatea)
+                };
+
+                NumericUpDown nudKomensalak = new NumericUpDown
+                {
+                    Left = 16,
+                    Top = 64,
+                    Width = 120,
+                    Minimum = 1,
+                    Maximum = mahaia.Kapazitatea,
+                    Value = 1
+                };
+
+                Button btnOnartu = new Button
+                {
+                    Text = "Onartu",
+                    DialogResult = DialogResult.OK,
+                    Width = 90,
+                    Left = 156,
+                    Top = 104
+                };
+
+                Button btnUtzi = new Button
+                {
+                    Text = "Utzi",
+                    DialogResult = DialogResult.Cancel,
+                    Width = 90,
+                    Left = 254,
+                    Top = 104
+                };
+
+                elkarrizketa.Controls.Add(lbl);
+                elkarrizketa.Controls.Add(nudKomensalak);
+                elkarrizketa.Controls.Add(btnOnartu);
+                elkarrizketa.Controls.Add(btnUtzi);
+                elkarrizketa.AcceptButton = btnOnartu;
+                elkarrizketa.CancelButton = btnUtzi;
+
+                var emaitza = elkarrizketa.ShowDialog(this);
+                if (emaitza != DialogResult.OK)
+                    return null;
+
+                return Convert.ToInt32(nudKomensalak.Value);
+            }
         }
 
         private void lblDataEuskera_Click(object sender, EventArgs e)

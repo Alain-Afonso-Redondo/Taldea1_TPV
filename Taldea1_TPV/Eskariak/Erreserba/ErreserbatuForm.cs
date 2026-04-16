@@ -19,6 +19,7 @@ namespace Taldea1TPV.Eskariak
         {
             InitializeComponent();
             _editatzen = false;
+            TxatBotoiaLaguntzailea.Erantsi(this);
         }
 
         public ErreserbatuForm(Erreserba erreserba)
@@ -26,6 +27,7 @@ namespace Taldea1TPV.Eskariak
             InitializeComponent();
             _editatzen = true;
             _erreserbaEditatzen = erreserba;
+            TxatBotoiaLaguntzailea.Erantsi(this);
         }
 
        

@@ -26,6 +26,8 @@ namespace Taldea1TPV
 
             if (erabiltzaileLogeatua != null)
             {
+                Saioa.UnekoErabiltzailea = erabiltzaileLogeatua;
+
                 MessageBox.Show(
                     "Ondo logeatu zara! Ongi etorri " + erabiltzailea,
                     "Login",
@@ -39,7 +41,11 @@ namespace Taldea1TPV
             }
             else
             {
-                lblMezua.Text = "Erabiltzaile edo pasahitza okerra.";
+                Saioa.UnekoErabiltzailea = null;
+
+                lblMezua.Text = string.IsNullOrWhiteSpace(login.AzkenErrorea)
+                    ? "Erabiltzaile edo pasahitza okerra."
+                    : login.AzkenErrorea;
                 lblMezua.ForeColor = Color.Red;
             }
         }
