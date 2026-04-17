@@ -14,8 +14,8 @@
         private void InitializeComponent()
         {
             this.pnlHeader = new System.Windows.Forms.Panel();
+            this.picLogoHeader = new System.Windows.Forms.PictureBox();
             this.lblErabiltzailea = new System.Windows.Forms.Label();
-            this.btnTxat = new System.Windows.Forms.Button();
 
             this.flpKategoriak = new System.Windows.Forms.FlowLayoutPanel();
             this.flpPlaterak = new System.Windows.Forms.FlowLayoutPanel();
@@ -28,6 +28,7 @@
             this.btnEskatu = new System.Windows.Forms.Button();
 
             // ================= FORM =================
+            ((System.ComponentModel.ISupportInitialize)(this.picLogoHeader)).BeginInit();
             this.SuspendLayout();
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.MinimumSize = new System.Drawing.Size(1280, 800);
@@ -36,30 +37,31 @@
 
             // ================= HEADER =================
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlHeader.Height = 60;
+            this.pnlHeader.Height = 88;
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
+            this.pnlHeader.Padding = new System.Windows.Forms.Padding(16, 8, 16, 8);
 
-            
+            // ================= LOGOA ===================
+            this.picLogoHeader.Dock = System.Windows.Forms.DockStyle.Left;
+            this.picLogoHeader.Image = global::Taldea1TPV.Properties.Resources.Logo_AJA_Sales;
+            this.picLogoHeader.Margin = new System.Windows.Forms.Padding(0);
+            this.picLogoHeader.Name = "picLogoHeader";
+            this.picLogoHeader.Size = new System.Drawing.Size(170, 72);
+            this.picLogoHeader.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picLogoHeader.TabIndex = 0;
+            this.picLogoHeader.TabStop = false;
 
             // ================= ERABILTZAILEA ===================
+            this.lblErabiltzailea.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblErabiltzailea.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.lblErabiltzailea.Location = new System.Drawing.Point(230, 18);
-            this.lblErabiltzailea.Size = new System.Drawing.Size(400, 23);
+            this.lblErabiltzailea.Location = new System.Drawing.Point(186, 8);
+            this.lblErabiltzailea.Padding = new System.Windows.Forms.Padding(20, 0, 0, 0);
+            this.lblErabiltzailea.Size = new System.Drawing.Size(400, 72);
             this.lblErabiltzailea.Text = "Erabiltzailea:";
-
-            // ================== TXAT ===================
-            this.btnTxat.Text = "Txata";
-            this.btnTxat.Size = new System.Drawing.Size(120, 32);
-            this.btnTxat.BackColor = System.Drawing.Color.FromArgb(31, 107, 58);
-            this.btnTxat.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTxat.FlatAppearance.BorderSize = 0;
-            this.btnTxat.ForeColor = System.Drawing.Color.White;
-            this.btnTxat.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            this.btnTxat.Location = new System.Drawing.Point(0, 14); // se ajusta al resize
-            this.btnTxat.Click += new System.EventHandler(this.btnTxat_Click);
+            this.lblErabiltzailea.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 
             this.pnlHeader.Controls.Add(this.lblErabiltzailea);
-            this.pnlHeader.Controls.Add(this.btnTxat);
+            this.pnlHeader.Controls.Add(this.picLogoHeader);
 
             // ================= KATEGORIAK =================
             this.flpKategoriak.Dock = System.Windows.Forms.DockStyle.Left;
@@ -131,12 +133,13 @@
             this.Controls.Add(this.pnlHeader);
 
             this.Load += new System.EventHandler(this.EskaerakForm_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.picLogoHeader)).EndInit();
             this.ResumeLayout(false);
         }
 
         private System.Windows.Forms.Panel pnlHeader;
+        private System.Windows.Forms.PictureBox picLogoHeader;
         private System.Windows.Forms.Label lblErabiltzailea;
-        private System.Windows.Forms.Button btnTxat;
 
         private System.Windows.Forms.FlowLayoutPanel flpKategoriak;
         private System.Windows.Forms.FlowLayoutPanel flpPlaterak;

@@ -36,6 +36,7 @@ namespace Taldea1TPV.Eskariak
             _erreserbaId = erreserbaId;
             _data = (data ?? DateTime.Today).Date;
             _txanda = string.IsNullOrWhiteSpace(txanda) ? "Bazkaria" : txanda;
+            TxatBotoiaLaguntzailea.Erantsi(this);
         }
 
         private void EskaerakForm_Load(object sender, EventArgs e)
@@ -409,9 +410,5 @@ namespace Taldea1TPV.Eskariak
                 kargatuPlaterakKategoriko(_aukeratutakoKategoriaId.Value);
         }
 
-        private void btnTxat_Click(object sender, EventArgs e)
-        {
-            TxatBotoiaLaguntzailea.IrekiTxata(this);
-        }
     }
 }
