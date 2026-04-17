@@ -17,6 +17,7 @@ namespace Taldea1TPV.Eskariak
         private readonly DateTime _data;
         private readonly string _txanda;
         private int? _eskaeraId;
+        private string _sukaldeaEgoera;
         private int? _aukeratutakoKategoriaId;
         private List<PlaterakDto> _platerakCache = new List<PlaterakDto>();
         private List<Karritoa> karritoa = new List<Karritoa>();
@@ -55,6 +56,7 @@ namespace Taldea1TPV.Eskariak
             if (eskaeraAktiboa == null)
             {
                 _eskaeraId = null;
+                _sukaldeaEgoera = null;
                 karritoa = new List<Karritoa>();
                 eguneratuKarritoa();
                 EguneratuFakturaBotoiak();
@@ -62,6 +64,7 @@ namespace Taldea1TPV.Eskariak
             }
 
             _eskaeraId = eskaeraAktiboa.Id;
+            _sukaldeaEgoera = eskaeraAktiboa.SukaldeaEgoera;
             _komensalak = eskaeraAktiboa.Komensalak > 0
                 ? eskaeraAktiboa.Komensalak
                 : _komensalak;
@@ -357,6 +360,12 @@ namespace Taldea1TPV.Eskariak
             if (!_eskaeraId.HasValue)
             {
                 MessageBox.Show("Mahai honek ez dauka eskaera aktiborik.");
+                return;
+            }
+
+            if (!string.Equals(_sukaldeaEgoera, "eginda", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("Ezin da tiketa sortu sukaldeko egoera 'eginda' izan arte.", "Egoera: " + (_sukaldeaEgoera ?? "nec"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 

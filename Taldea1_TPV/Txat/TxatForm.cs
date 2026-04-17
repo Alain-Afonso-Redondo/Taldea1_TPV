@@ -14,12 +14,13 @@ namespace Taldea1TPV
         private StreamWriter idazlea;
         private Thread entzunHari;
         private string azkenBidalitakoMezua = "";
+        private bool _lehenMezuaIragazita = false;
 
         public TxatForm(string erabiltzaile)
         {
             InitializeComponent();
-            erabiltzaileIzena = erabiltzaile;
-            lblErabiltzaile.Text = "Kaixo, " + erabiltzaile;
+            erabiltzaileIzena = string.IsNullOrWhiteSpace(erabiltzaile) ? "Erabiltzailea" : erabiltzaile;
+            lblErabiltzaile.Text = "Kaixo, " + erabiltzaileIzena;
 
             txtSarrera.KeyDown += (s, e) => {
                 if (e.KeyCode == Keys.Enter && !e.Shift) {
@@ -81,8 +82,18 @@ namespace Taldea1TPV
             string msgNormalizado = msg.Trim();
             string azkenNormalizado = azkenBidalitakoMezua.Trim();
 
-            // El servidor devuelve el nombre al conectar; no lo mostramos como burbuja.
-            if (msgNormalizado.Equals(erabiltzaileIzena, StringComparison.OrdinalIgnoreCase))
+            // Filtrar mensajes que contengan "Sistemaren mezua" o que no tengan separadores.
+            // Esto evita mostrar notificaciones técnicas del servidor como burbujas de chat.
+            if (msgNormalizado.IndexOf("Sistemaren mezua", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return;
+            }
+
+            string[] separadoreak = { ":", ">", "-", "]", "»" };
+            bool baduSeparadorerik = false;
+            foreach (var sep in separadoreak) { if (msg.Contains(sep)) { baduSeparadorerik = true; break; } }
+            
+            if (!baduSeparadorerik)
             {
                 return;
             }
@@ -105,16 +116,47 @@ namespace Taldea1TPV
 
         private void GehituMezuBurbula(string msg)
         {
-            bool nireaDa = msg.StartsWith(erabiltzaileIzena + ":");
             string edukia = msg;
             string bidaltzailea = "";
 
-            if (msg.Contains(":"))
+            // List of common separators between sender and message
+            string[] separadoreak = { ":", ">", "-", "]", "»" };
+            int index = -1;
+            string aukeratutakoSeparadorea = "";
+
+            foreach (var sep in separadoreak)
             {
-                int index = msg.IndexOf(":");
-                bidaltzailea = msg.Substring(0, index).Trim();
-                edukia = msg.Substring(index + 1).Trim();
+                int pos = msg.IndexOf(sep);
+                if (pos > 0 && (index == -1 || pos < index))
+                {
+                    index = pos;
+                    aukeratutakoSeparadorea = sep;
+                }
             }
+
+            if (index != -1)
+            {
+                bidaltzailea = msg.Substring(0, index).Trim();
+                
+                // If it was a closing bracket, we might have an opening bracket at the start
+                if (aukeratutakoSeparadorea == "]" && bidaltzailea.StartsWith("["))
+                {
+                    bidaltzailea = bidaltzailea.Substring(1).Trim();
+                }
+
+                edukia = msg.Substring(index + aukeratutakoSeparadorea.Length).Trim();
+            }
+
+            // Ignorar mensajes si el remitente es genérico o del sistema
+            if (string.IsNullOrWhiteSpace(bidaltzailea) || 
+                bidaltzailea.IndexOf("Sistemaren mezua", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                bidaltzailea.Equals("System", StringComparison.OrdinalIgnoreCase) ||
+                bidaltzailea.Equals("Server", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            bool nireaDa = string.Equals(bidaltzailea, erabiltzaileIzena, StringComparison.OrdinalIgnoreCase);
 
             Panel pnlLerroa = new Panel();
             pnlLerroa.Width = flpMezuak.ClientSize.Width - 20;
@@ -158,10 +200,12 @@ namespace Taldea1TPV
                 if (!string.IsNullOrEmpty(bidaltzailea))
                 {
                     lblIzena.Text = bidaltzailea;
+                    lblIzena.Visible = true;
                 }
                 else
                 {
-                    lblIzena.Text = "Erabiltzailea";
+                    lblIzena.Text = "";
+                    lblIzena.Visible = false;
                 }
                 
                 pnlBurbula.Anchor = AnchorStyles.Left;

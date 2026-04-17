@@ -44,7 +44,8 @@ namespace Taldea1TPV.Eskariak
                 {
                     Id = dto.Id,
                     MahaiaId = dto.MahaiaId,
-                    Komensalak = dto.Komensalak
+                    Komensalak = dto.Komensalak,
+                    SukaldeaEgoera = dto.SukaldeaEgoera
                 };
             }
         }
@@ -301,6 +302,7 @@ namespace Taldea1TPV.Eskariak
         public int Id { get; set; }
         public int MahaiaId { get; set; }
         public int Komensalak { get; set; }
+        public string SukaldeaEgoera { get; set; }
     }
 
     internal class EskaeraAktiboaDto
@@ -308,6 +310,7 @@ namespace Taldea1TPV.Eskariak
         public int Id { get; set; }
         public int MahaiaId { get; set; }
         public int Komensalak { get; set; }
+        public string SukaldeaEgoera { get; set; }
     }
 
     internal class EskaeraProduktuaLortuDto
