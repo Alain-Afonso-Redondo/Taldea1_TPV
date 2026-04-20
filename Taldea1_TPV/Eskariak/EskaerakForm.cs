@@ -17,6 +17,7 @@ namespace Taldea1TPV.Eskariak
         private readonly DateTime _data;
         private readonly string _txanda;
         private int? _eskaeraId;
+        private string _eskaeraEgoera;
         private string _sukaldeaEgoera;
         private int? _aukeratutakoKategoriaId;
         private List<PlaterakDto> _platerakCache = new List<PlaterakDto>();
@@ -56,6 +57,7 @@ namespace Taldea1TPV.Eskariak
             if (eskaeraAktiboa == null)
             {
                 _eskaeraId = null;
+                _eskaeraEgoera = null;
                 _sukaldeaEgoera = null;
                 karritoa = new List<Karritoa>();
                 eguneratuKarritoa();
@@ -64,6 +66,7 @@ namespace Taldea1TPV.Eskariak
             }
 
             _eskaeraId = eskaeraAktiboa.Id;
+            _eskaeraEgoera = eskaeraAktiboa.Egoera;
             _sukaldeaEgoera = eskaeraAktiboa.SukaldeaEgoera;
             _komensalak = eskaeraAktiboa.Komensalak > 0
                 ? eskaeraAktiboa.Komensalak
@@ -178,6 +181,12 @@ namespace Taldea1TPV.Eskariak
 
         private void gehituKarritora(PlaterakDto p)
         {
+            if (EskaeraBlokeatutaDago())
+            {
+                MessageBox.Show("Eskaera hau ordainketara bidalita dago eta ezin da gehiago aldatu.");
+                return;
+            }
+
             var produktua = karritoa.FirstOrDefault(x => x.PlaterakId == p.Id);
 
             if (produktua == null)
@@ -201,6 +210,7 @@ namespace Taldea1TPV.Eskariak
         private void eguneratuKarritoa()
         {
             flpKarritoa.Controls.Clear();
+            var eskaeraBlokeatuta = EskaeraBlokeatutaDago();
 
             foreach (var produktuKarrito in karritoa.ToList())
             {
@@ -236,9 +246,9 @@ namespace Taldea1TPV.Eskariak
                     ForeColor = Color.Black
                 };
 
-                Button btnPlus = new Button { Text = "+", Location = new Point(120, 35), Size = new Size(30, 25), ForeColor = Color.Black };
-                Button btnMinus = new Button { Text = "-", Location = new Point(160, 35), Size = new Size(30, 25), ForeColor = Color.Black };
-                Button btnEzabatu = new Button { Text = "X", Location = new Point(310, 35), Size = new Size(30, 25), ForeColor = Color.Black };
+                Button btnPlus = new Button { Text = "+", Location = new Point(120, 35), Size = new Size(30, 25), ForeColor = Color.Black, Enabled = !eskaeraBlokeatuta };
+                Button btnMinus = new Button { Text = "-", Location = new Point(160, 35), Size = new Size(30, 25), ForeColor = Color.Black, Enabled = !eskaeraBlokeatuta };
+                Button btnEzabatu = new Button { Text = "X", Location = new Point(310, 35), Size = new Size(30, 25), ForeColor = Color.Black, Enabled = !eskaeraBlokeatuta };
 
                 btnPlus.Click += (s, e) =>
                 {
@@ -279,12 +289,26 @@ namespace Taldea1TPV.Eskariak
         private void EguneratuFakturaBotoiak()
         {
             var badagoEskaera = _eskaeraId.HasValue;
-            btnItxiFaktura.Enabled = badagoEskaera;
+            var eskaeraBlokeatuta = EskaeraBlokeatutaDago();
+            btnItxiFaktura.Enabled = badagoEskaera && !eskaeraBlokeatuta;
             btnSortuTiket.Enabled = badagoEskaera;
+            btnEskatu.Enabled = !eskaeraBlokeatuta;
+        }
+
+        private bool EskaeraBlokeatutaDago()
+        {
+            return string.Equals(_eskaeraEgoera, "ordainketa_pendiente", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(_eskaeraEgoera, "itxita", StringComparison.OrdinalIgnoreCase);
         }
 
         private void btnEskatu_Klik(object sender, EventArgs e)
         {
+            if (EskaeraBlokeatutaDago())
+            {
+                MessageBox.Show("Eskaera hau ordainketara bidalita dago eta ezin da gehiago aldatu.");
+                return;
+            }
+
             if (!karritoa.Any())
             {
                 MessageBox.Show("Karritoa hutsik dago");
@@ -353,6 +377,10 @@ namespace Taldea1TPV.Eskariak
                 "Ondo",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
+
+            _eskaeraEgoera = "ordainketa_pendiente";
+            EguneratuFakturaBotoiak();
+            eguneratuKarritoa();
         }
 
         private void btnSortuTiket_Click(object sender, EventArgs e)
