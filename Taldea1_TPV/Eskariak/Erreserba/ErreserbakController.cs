@@ -15,7 +15,7 @@ namespace Taldea1TPV.Eskariak
 
         public List<Erreserba> LortuErreserbak()
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.GetAsync("api/Erreserbak").Result;
@@ -38,7 +38,7 @@ namespace Taldea1TPV.Eskariak
 
         public List<Erreserba> LortuErreserbakData(DateTime data)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -63,7 +63,7 @@ namespace Taldea1TPV.Eskariak
 
         public Erreserba SortuErreserba(Erreserba erreserba)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -89,7 +89,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool EguneratuErreserba(Erreserba erreserba)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -104,7 +104,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool EzabatuErreserba(int id)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.DeleteAsync($"api/Erreserbak/{id}").Result;
@@ -133,3 +133,4 @@ namespace Taldea1TPV.Eskariak
         }
     }
 }
+

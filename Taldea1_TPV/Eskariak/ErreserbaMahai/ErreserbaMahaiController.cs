@@ -13,7 +13,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool GehituMahaiErreserbara(int erreserbaId, int mahaiId)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -33,7 +33,7 @@ namespace Taldea1TPV.Eskariak
 
         public List<int> LortuMahaiakErreserbarentzat(int erreserbaId)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.GetAsync($"api/ErreserbaMahaiak/erreserba/{erreserbaId}").Result;
@@ -52,7 +52,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool EguneratuMahaiErreserban(int erreserbaId, int mahaiIdBerria)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -76,7 +76,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool EzabatuMahaiakErreserbatik(int erreserbaId)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.DeleteAsync($"api/ErreserbaMahaiak/erreserba/{erreserbaId}").Result;
@@ -86,3 +86,4 @@ namespace Taldea1TPV.Eskariak
         }
     }
 }
+

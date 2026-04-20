@@ -19,6 +19,28 @@ namespace Taldea1TPV
         }
     }
 
+    internal static class ApiClientFactory
+    {
+        public static HttpClient Create()
+        {
+            var client = new HttpClient
+            {
+                BaseAddress = new System.Uri(ApiConfig.BaseUrl)
+            };
+
+            var unekoErabiltzailea = Saioa.UnekoErabiltzailea;
+            if (unekoErabiltzailea != null)
+            {
+                if (!string.IsNullOrWhiteSpace(unekoErabiltzailea.Erabiltzailea))
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("X-TPV-User", unekoErabiltzailea.Erabiltzailea);
+
+                client.DefaultRequestHeaders.TryAddWithoutValidation("X-User-Id", unekoErabiltzailea.Id.ToString());
+            }
+
+            return client;
+        }
+    }
+
     internal class ErabiltzaileController
     {
         private const int ZerbitzariaRolaId = 2;
@@ -26,7 +48,7 @@ namespace Taldea1TPV
 
         public Erabiltzaileak BalidatuLogin(string erabiltzailea, string pasahitza)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new System.Uri(ApiConfig.BaseUrl);
 
@@ -79,7 +101,7 @@ namespace Taldea1TPV
 
         public bool? LortuTxatBaimena(int erabiltzaileId)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new System.Uri(ApiConfig.BaseUrl);
 
@@ -147,3 +169,4 @@ namespace Taldea1TPV
         public string Izena { get; set; }
     }
 }
+

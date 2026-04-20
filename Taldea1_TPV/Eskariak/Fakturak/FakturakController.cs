@@ -15,7 +15,7 @@ namespace Taldea1TPV.Eskariak
 
         public List<Fakturak> LortuFakturak()
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -39,7 +39,7 @@ namespace Taldea1TPV.Eskariak
 
         public Fakturak LortuFaktura(int id)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -63,7 +63,7 @@ namespace Taldea1TPV.Eskariak
 
         public Fakturak LortuFakturaErreserbarenArabera(int erreserbaId)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -87,7 +87,7 @@ namespace Taldea1TPV.Eskariak
 
         public Fakturak SortuEdoLortuFakturaErreserbatik(int erreserbaId)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -115,7 +115,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool EzabatuFaktura(int id)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -127,7 +127,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool EguneratuTotala(int fakturaId, double gehikuntza)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -165,3 +165,4 @@ namespace Taldea1TPV.Eskariak
         }
     }
 }
+

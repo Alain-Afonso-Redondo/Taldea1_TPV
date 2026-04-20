@@ -13,7 +13,7 @@ namespace Taldea1TPV.Eskariak
 
         public List<Kategoriak> LortuKategoriak()
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.GetAsync("api/kategoriak").Result;
@@ -32,7 +32,7 @@ namespace Taldea1TPV.Eskariak
 
         public Kategoriak LortuKategoria(int id)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.GetAsync(string.Format("api/kategoriak/{0}", id)).Result;
@@ -51,7 +51,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool SortuKategoria(Kategoriak kategoria)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var json = JsonConvert.SerializeObject(kategoria);
@@ -63,7 +63,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool EzabatuKategoria(int id)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.DeleteAsync(string.Format("api/kategoriak/{0}", id)).Result;
@@ -72,3 +72,4 @@ namespace Taldea1TPV.Eskariak
         }
     }
 }
+

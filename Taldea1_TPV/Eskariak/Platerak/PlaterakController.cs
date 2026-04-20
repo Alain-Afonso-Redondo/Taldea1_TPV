@@ -13,7 +13,7 @@ namespace Taldea1TPV.Eskariak
 
         public List<Platerak> LortuPlaterak()
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.GetAsync("api/produktuak").Result;
@@ -33,7 +33,7 @@ namespace Taldea1TPV.Eskariak
 
         public Platerak LortuPlatera(int id)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.GetAsync(string.Format("api/produktuak/{0}", id)).Result;
@@ -53,7 +53,7 @@ namespace Taldea1TPV.Eskariak
 
         public List<PlaterakDto> LortuPlaterakKategoriatik(int kategoriaId)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.GetAsync("api/produktuak").Result;
@@ -72,7 +72,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool SortuPlatera(Platerak platera)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var json = JsonConvert.SerializeObject(platera);
@@ -84,7 +84,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool EzabatuPlatera(int id)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.DeleteAsync(string.Format("api/produktuak/{0}", id)).Result;
@@ -118,3 +118,4 @@ namespace Taldea1TPV.Eskariak
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using Newtonsoft.Json;
@@ -13,7 +13,7 @@ namespace Taldea1TPV.Eskariak
         // Plater baten osagaiak lortzea
         public List<PlateraOsagaiak> LortuOsagaiakPlateratik(int plateraId)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -32,7 +32,7 @@ namespace Taldea1TPV.Eskariak
         // Osagaia plater batera gehitzea
         public bool GehituOsagaiaPlaterari(PlateraOsagaiak plateraOsagaia)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -49,7 +49,7 @@ namespace Taldea1TPV.Eskariak
         // Plater baten osagaia ezabatzea
         public bool EzabatuOsagaiaPlateratik(int id)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -60,3 +60,4 @@ namespace Taldea1TPV.Eskariak
         }
     }
 }
+

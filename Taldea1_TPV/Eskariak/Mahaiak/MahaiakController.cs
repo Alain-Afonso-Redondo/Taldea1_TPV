@@ -13,7 +13,7 @@ namespace Taldea1TPV.Eskariak
 
         public List<Mahaiak> LortuMahaiak(DateTime? data = null, string txanda = null)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var url = "api/mahaiak";
@@ -43,7 +43,7 @@ namespace Taldea1TPV.Eskariak
 
         public Mahaiak LortuMahaia(int id, DateTime? data = null, string txanda = null)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var url = string.Format("api/mahaiak/{0}", id);
@@ -94,3 +94,4 @@ namespace Taldea1TPV.Eskariak
         }
     }
 }
+

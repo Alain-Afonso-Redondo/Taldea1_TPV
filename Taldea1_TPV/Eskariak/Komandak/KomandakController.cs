@@ -15,7 +15,7 @@ namespace Taldea1TPV.Eskariak
 
         public EskaeraAktiboa LortuEskaeraAktiboaMahaika(int mahaiaId, DateTime? data = null, string txanda = null)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var url = $"api/eskaerak/mahaia/{mahaiaId}/aktiboa";
@@ -53,7 +53,7 @@ namespace Taldea1TPV.Eskariak
 
         public List<Karritoa> LortuEskaeraProduktuak(int eskaeraId)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 var response = client.GetAsync($"api/eskaerak/{eskaeraId}/produktuak").Result;
@@ -121,7 +121,7 @@ namespace Taldea1TPV.Eskariak
             List<Karritoa> karritoa,
             out string errorea)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -160,7 +160,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool EguneratuEskaera(int eskaeraId, int komensalak, List<Karritoa> karritoa, out string errorea)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -193,7 +193,7 @@ namespace Taldea1TPV.Eskariak
 
         public bool OrdaintzeraBidali(int eskaeraId, out string errorea)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -214,7 +214,7 @@ namespace Taldea1TPV.Eskariak
 
         public string SortuFaktura(int eskaeraId, out string errorea)
         {
-            using (var client = new HttpClient())
+            using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
 
@@ -324,3 +324,4 @@ namespace Taldea1TPV.Eskariak
         public int Kantitatea { get; set; }
     }
 }
+
