@@ -17,6 +17,15 @@ namespace Taldea1TPV
                 return string.IsNullOrWhiteSpace(value) ? "http://localhost:5093/" : value;
             }
         }
+
+        public static string OdooApiBaseUrl
+        {
+            get
+            {
+                var value = ConfigurationManager.AppSettings["OdooApiBaseUrl"];
+                return string.IsNullOrWhiteSpace(value) ? "http://localhost:5015/" : value;
+            }
+        }
     }
 
     internal static class ApiClientFactory

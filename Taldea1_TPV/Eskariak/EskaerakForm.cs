@@ -19,6 +19,8 @@ namespace Taldea1TPV.Eskariak
         private int? _eskaeraId;
         private string _eskaeraEgoera;
         private string _sukaldeaEgoera;
+        private string _deskontuKodeaAktiboa;
+        private decimal _deskontuPortzentaiaAktiboa;
         private int? _aukeratutakoKategoriaId;
         private List<PlaterakDto> _platerakCache = new List<PlaterakDto>();
         private List<Karritoa> karritoa = new List<Karritoa>();
@@ -59,6 +61,8 @@ namespace Taldea1TPV.Eskariak
                 _eskaeraId = null;
                 _eskaeraEgoera = null;
                 _sukaldeaEgoera = null;
+                _deskontuKodeaAktiboa = null;
+                _deskontuPortzentaiaAktiboa = 0;
                 karritoa = new List<Karritoa>();
                 eguneratuKarritoa();
                 EguneratuFakturaBotoiak();
@@ -68,6 +72,10 @@ namespace Taldea1TPV.Eskariak
             _eskaeraId = eskaeraAktiboa.Id;
             _eskaeraEgoera = eskaeraAktiboa.Egoera;
             _sukaldeaEgoera = eskaeraAktiboa.SukaldeaEgoera;
+            _deskontuKodeaAktiboa = string.IsNullOrWhiteSpace(eskaeraAktiboa.DeskontuKodea) ? null : eskaeraAktiboa.DeskontuKodea.Trim();
+            _deskontuPortzentaiaAktiboa = string.IsNullOrWhiteSpace(_deskontuKodeaAktiboa)
+                ? 0
+                : Math.Max(0, Math.Min(100, eskaeraAktiboa.DeskontuPortzentaia));
             _komensalak = eskaeraAktiboa.Komensalak > 0
                 ? eskaeraAktiboa.Komensalak
                 : _komensalak;
@@ -211,6 +219,7 @@ namespace Taldea1TPV.Eskariak
         {
             flpKarritoa.Controls.Clear();
             var eskaeraBlokeatuta = EskaeraBlokeatutaDago();
+            var deskontuaAktibo = _deskontuPortzentaiaAktiboa > 0 && !string.IsNullOrWhiteSpace(_deskontuKodeaAktiboa);
 
             foreach (var produktuKarrito in karritoa.ToList())
             {
@@ -241,7 +250,7 @@ namespace Taldea1TPV.Eskariak
 
                 Label lblPrezioa = new Label
                 {
-                    Text = string.Format("{0:0.00} EUR", produktuKarrito.Totala),
+                    Text = string.Format("{0:0.00} EUR", KalkulatuKarritokoLerroTotala(produktuKarrito)),
                     Location = new Point(250, 40),
                     ForeColor = Color.Black
                 };
@@ -282,7 +291,10 @@ namespace Taldea1TPV.Eskariak
                 flpKarritoa.Controls.Add(panel);
             }
 
-            lblTotala.Text = "Totala: " + karritoa.Sum(c => c.Totala).ToString("0.00") + " EUR";
+            var totala = KalkulatuKarritoTotala();
+            lblTotala.Text = deskontuaAktibo
+                ? $"Totala ({_deskontuKodeaAktiboa} - {_deskontuPortzentaiaAktiboa:0.##}%): {totala:0.00} EUR"
+                : $"Totala: {totala:0.00} EUR";
             EguneratuFakturaBotoiak();
         }
 
@@ -350,19 +362,54 @@ namespace Taldea1TPV.Eskariak
                 return;
             }
 
-            var baieztatu = MessageBox.Show(
-                "Mahai honetako faktura ordainketara bidali nahi duzu?",
+            var komandaController = new KomandakController();
+            var deskontuGaldera = ErakutsiBaiEzLeihoa(
+                "Deskontua",
+                "Baduzu deskontu koderik?",
+                true);
+
+            if (deskontuGaldera == DialogResult.Cancel)
+                return;
+
+            string deskontuKodea = null;
+            decimal deskontuPortzentaia = 0;
+
+            if (deskontuGaldera == DialogResult.Yes)
+            {
+                var kodea = EskatuTestua("Deskontu kodea", "Sartu deskontu kodea:");
+                if (string.IsNullOrWhiteSpace(kodea))
+                {
+                    MessageBox.Show("Deskontu kodea derrigorrezkoa da.");
+                    return;
+                }
+
+                string deskontuErrorea;
+                if (!komandaController.EgiaztatuDeskontuKodea(kodea.Trim(), out deskontuPortzentaia, out deskontuErrorea))
+                {
+                    MessageBox.Show(
+                        string.IsNullOrWhiteSpace(deskontuErrorea) ? "Kodea ez da zuzena edo ez dago aktibo." : deskontuErrorea,
+                        "Errorea",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                deskontuKodea = kodea.Trim();
+            }
+
+            var baieztatu = ErakutsiBaiEzLeihoa(
                 "Itxi faktura",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
+                "Mahai honetako faktura ordainketara bidali nahi duzu?");
 
             if (baieztatu != DialogResult.Yes)
                 return;
 
-            var komandaController = new KomandakController();
             string errorea;
+            var ondo = string.IsNullOrWhiteSpace(deskontuKodea)
+                ? komandaController.OrdaintzeraBidali(_eskaeraId.Value, out errorea)
+                : komandaController.OrdaintzeraBidali(_eskaeraId.Value, deskontuKodea, deskontuPortzentaia, out errorea);
 
-            if (!komandaController.OrdaintzeraBidali(_eskaeraId.Value, out errorea))
+            if (!ondo)
             {
                 MessageBox.Show(
                     string.IsNullOrWhiteSpace(errorea) ? "Ezin izan da faktura itxi." : errorea,
@@ -373,11 +420,15 @@ namespace Taldea1TPV.Eskariak
             }
 
             MessageBox.Show(
-                "Faktura ordainketara bidali da.",
+                string.IsNullOrWhiteSpace(deskontuKodea)
+                    ? "Faktura ordainketara bidali da."
+                    : $"Faktura ordainketara bidali da. Aplikatutako deskontua: {deskontuPortzentaia:0.##}%",
                 "Ondo",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
 
+            _deskontuKodeaAktiboa = string.IsNullOrWhiteSpace(deskontuKodea) ? null : deskontuKodea;
+            _deskontuPortzentaiaAktiboa = string.IsNullOrWhiteSpace(deskontuKodea) ? 0 : deskontuPortzentaia;
             _eskaeraEgoera = "ordainketa_pendiente";
             EguneratuFakturaBotoiak();
             eguneratuKarritoa();
@@ -393,15 +444,13 @@ namespace Taldea1TPV.Eskariak
 
             if (!string.Equals(_sukaldeaEgoera, "eginda", StringComparison.OrdinalIgnoreCase))
             {
-                MessageBox.Show("Ezin da tiketa sortu sukaldeko egoera 'eginda' izan arte.", "Egoera: " + (_sukaldeaEgoera ?? "nec"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Ezin da tiketa sortu sukaldeko egoera 'eginda' izan arte.", "Egoera: " + (_sukaldeaEgoera ?? "ez dago"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var baieztatu = MessageBox.Show(
-                "Mahai honetako tiketa sortu nahi duzu?",
+            var baieztatu = ErakutsiBaiEzLeihoa(
                 "Sortu tiketa",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
+                "Mahai honetako tiketa sortu nahi duzu?");
 
             if (baieztatu != DialogResult.Yes)
                 return;
@@ -445,6 +494,140 @@ namespace Taldea1TPV.Eskariak
         {
             if (_aukeratutakoKategoriaId.HasValue)
                 kargatuPlaterakKategoriko(_aukeratutakoKategoriaId.Value);
+        }
+
+        private static string EskatuTestua(string titulua, string galdera)
+        {
+            using (var leihoa = new Form())
+            {
+                leihoa.Width = 420;
+                leihoa.Height = 180;
+                leihoa.Text = titulua;
+                leihoa.FormBorderStyle = FormBorderStyle.FixedDialog;
+                leihoa.StartPosition = FormStartPosition.CenterParent;
+                leihoa.MinimizeBox = false;
+                leihoa.MaximizeBox = false;
+
+                var etiketa = new Label
+                {
+                    Left = 20,
+                    Top = 20,
+                    Width = 360,
+                    Text = galdera
+                };
+
+                var testuKaxa = new TextBox
+                {
+                    Left = 20,
+                    Top = 50,
+                    Width = 360
+                };
+
+                var onartu = new Button
+                {
+                    Text = "Onartu",
+                    DialogResult = DialogResult.OK,
+                    Left = 220,
+                    Width = 75,
+                    Top = 90
+                };
+
+                var utzi = new Button
+                {
+                    Text = "Utzi",
+                    DialogResult = DialogResult.Cancel,
+                    Left = 305,
+                    Width = 75,
+                    Top = 90
+                };
+
+                leihoa.Controls.Add(etiketa);
+                leihoa.Controls.Add(testuKaxa);
+                leihoa.Controls.Add(onartu);
+                leihoa.Controls.Add(utzi);
+                leihoa.AcceptButton = onartu;
+                leihoa.CancelButton = utzi;
+
+                return leihoa.ShowDialog() == DialogResult.OK
+                    ? testuKaxa.Text.Trim()
+                    : null;
+            }
+        }
+
+        private DialogResult ErakutsiBaiEzLeihoa(string titulua, string galdera, bool utziBotoia = false)
+        {
+            using (var leihoa = new Form())
+            {
+                leihoa.Width = 440;
+                leihoa.Height = 190;
+                leihoa.Text = titulua;
+                leihoa.FormBorderStyle = FormBorderStyle.FixedDialog;
+                leihoa.StartPosition = FormStartPosition.CenterParent;
+                leihoa.MinimizeBox = false;
+                leihoa.MaximizeBox = false;
+
+                var etiketa = new Label
+                {
+                    Left = 20,
+                    Top = 20,
+                    Width = 390,
+                    Height = 60,
+                    Text = galdera
+                };
+
+                var btnBai = new Button
+                {
+                    Text = "Bai",
+                    DialogResult = DialogResult.Yes,
+                    Left = utziBotoia ? 170 : 250,
+                    Width = 75,
+                    Top = 100
+                };
+
+                var btnEz = new Button
+                {
+                    Text = "Ez",
+                    DialogResult = DialogResult.No,
+                    Left = utziBotoia ? 255 : 335,
+                    Width = 75,
+                    Top = 100
+                };
+
+                leihoa.Controls.Add(etiketa);
+                leihoa.Controls.Add(btnBai);
+                leihoa.Controls.Add(btnEz);
+
+                if (utziBotoia)
+                {
+                    var btnUtzi = new Button
+                    {
+                        Text = "Utzi",
+                        DialogResult = DialogResult.Cancel,
+                        Left = 340,
+                        Width = 75,
+                        Top = 100
+                    };
+                    leihoa.Controls.Add(btnUtzi);
+                    leihoa.CancelButton = btnUtzi;
+                }
+
+                leihoa.AcceptButton = btnBai;
+                return leihoa.ShowDialog(this);
+            }
+        }
+
+        private decimal KalkulatuKarritokoLerroTotala(Karritoa lerroa)
+        {
+            var unitarioa = (decimal)lerroa.Prezioa;
+            if (_deskontuPortzentaiaAktiboa > 0 && !string.IsNullOrWhiteSpace(_deskontuKodeaAktiboa))
+                unitarioa = unitarioa * (1 - (_deskontuPortzentaiaAktiboa / 100m));
+
+            return Math.Round(unitarioa * lerroa.Kopurua, 2, MidpointRounding.AwayFromZero);
+        }
+
+        private decimal KalkulatuKarritoTotala()
+        {
+            return karritoa.Sum(k => KalkulatuKarritokoLerroTotala(k));
         }
 
     }

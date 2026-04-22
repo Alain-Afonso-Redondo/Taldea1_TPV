@@ -46,7 +46,9 @@ namespace Taldea1TPV.Eskariak
                     MahaiaId = dto.MahaiaId,
                     Komensalak = dto.Komensalak,
                     Egoera = dto.Egoera,
-                    SukaldeaEgoera = dto.SukaldeaEgoera
+                    SukaldeaEgoera = dto.SukaldeaEgoera,
+                    DeskontuKodea = dto.DeskontuKodea,
+                    DeskontuPortzentaia = dto.DeskontuPortzentaia
                 };
             }
         }
@@ -191,13 +193,73 @@ namespace Taldea1TPV.Eskariak
             }
         }
 
+        public bool EgiaztatuDeskontuKodea(string kodea, out decimal deskontuPortzentaia, out string errorea)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(ApiConfig.OdooApiBaseUrl);
+
+                var body = new
+                {
+                    kodea = kodea
+                };
+
+                var json = JsonConvert.SerializeObject(body);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = client.PostAsync("api/deskontuak/egiaztatu", content).Result;
+                AzkenErrorea = null;
+                deskontuPortzentaia = 0;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    errorea = "Ezin izan da deskontu kodea egiaztatu.";
+                    AzkenErrorea = errorea;
+                    return false;
+                }
+
+                var resultJson = response.Content.ReadAsStringAsync().Result;
+                var emaitza = JsonConvert.DeserializeObject<OdooDeskontuEmaitzaDto>(resultJson);
+
+                if (emaitza == null || !emaitza.ExistitzenDa || emaitza.Balioa <= 0)
+                {
+                    errorea = "Kodea ez da zuzena edo ez dago aktibo.";
+                    AzkenErrorea = errorea;
+                    return false;
+                }
+
+                deskontuPortzentaia = Math.Round(Convert.ToDecimal(emaitza.Balioa), 2);
+                errorea = null;
+                return true;
+            }
+        }
+
         public bool OrdaintzeraBidali(int eskaeraId, out string errorea)
+        {
+            return OrdaintzeraBidaliBarne(eskaeraId, null, out errorea);
+        }
+
+        public bool OrdaintzeraBidali(int eskaeraId, string deskontuKodea, decimal deskontuPortzentaia, out string errorea)
+        {
+            var body = new EskaeraOrdainduDto
+            {
+                DeskontuKodea = deskontuKodea,
+                DeskontuPortzentaia = deskontuPortzentaia
+            };
+
+            return OrdaintzeraBidaliBarne(eskaeraId, body, out errorea);
+        }
+
+        private bool OrdaintzeraBidaliBarne(int eskaeraId, EskaeraOrdainduDto body, out string errorea)
         {
             using (var client = ApiClientFactory.Create())
             {
                 client.BaseAddress = new Uri(_baseUrl);
-
-                var response = client.PostAsync($"api/eskaerak/{eskaeraId}/ordainduEskaera", null).Result;
+                var response = body == null
+                    ? client.PostAsync($"api/eskaerak/{eskaeraId}/ordainduEskaera", null).Result
+                    : client.PostAsync(
+                        $"api/eskaerak/{eskaeraId}/ordainduEskaeraDeskontuarekin",
+                        new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
+                      ).Result;
                 AzkenErrorea = null;
 
                 if (!response.IsSuccessStatusCode)
@@ -305,6 +367,8 @@ namespace Taldea1TPV.Eskariak
         public int Komensalak { get; set; }
         public string Egoera { get; set; }
         public string SukaldeaEgoera { get; set; }
+        public string DeskontuKodea { get; set; }
+        public decimal DeskontuPortzentaia { get; set; }
     }
 
     internal class EskaeraAktiboaDto
@@ -314,6 +378,8 @@ namespace Taldea1TPV.Eskariak
         public int Komensalak { get; set; }
         public string Egoera { get; set; }
         public string SukaldeaEgoera { get; set; }
+        public string DeskontuKodea { get; set; }
+        public decimal DeskontuPortzentaia { get; set; }
     }
 
     internal class EskaeraProduktuaLortuDto
@@ -322,6 +388,18 @@ namespace Taldea1TPV.Eskariak
         public string ProduktuaIzena { get; set; }
         public decimal PrezioUnitarioa { get; set; }
         public int Kantitatea { get; set; }
+    }
+
+    internal class OdooDeskontuEmaitzaDto
+    {
+        public bool ExistitzenDa { get; set; }
+        public double Balioa { get; set; }
+    }
+
+    internal class EskaeraOrdainduDto
+    {
+        public string DeskontuKodea { get; set; }
+        public decimal? DeskontuPortzentaia { get; set; }
     }
 }
 
