@@ -117,4 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="Fitxategi_Botoia.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACkAAAAlCAYAAADfosCNAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        wgAADsIBFShKgAAAAI9JREFUWEftzjEKgDAUg+Gex/M4dPao6hG8hYugiINQt2KzmEKQDgl8kzz7h+AJ
+        d0xxPqeYWHj/yzCCgf9gdi9DYhWH19h3GMAofkIMIxj5GB+vUVR8DAMY+RgfXrddDh9nOfINH66RI/FD
+        Sxyp4kgVR6o4UsWRKo5UcaSKI1UcqeJIFUeq5MhWQ4tAz2tsD+/UWZq6dj4DAAAAAElFTkSuQmCC
+</value>
+  </data>
 </root>

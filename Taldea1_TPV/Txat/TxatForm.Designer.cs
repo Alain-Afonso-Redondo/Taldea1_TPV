@@ -15,11 +15,13 @@
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TxatForm));
             this.lblErabiltzaile = new System.Windows.Forms.Label();
             this.flpMezuak = new System.Windows.Forms.FlowLayoutPanel();
             this.txtSarrera = new System.Windows.Forms.TextBox();
             this.btnBidali = new System.Windows.Forms.Button();
             this.pnlSarrera = new System.Windows.Forms.Panel();
+            this.Fitxategi_Botoia = new System.Windows.Forms.Button();
             this.pnlGoiburua = new System.Windows.Forms.Panel();
             this.pnlSarrera.SuspendLayout();
             this.pnlGoiburua.SuspendLayout();
@@ -32,7 +34,7 @@
             this.lblErabiltzaile.ForeColor = System.Drawing.Color.White;
             this.lblErabiltzaile.Location = new System.Drawing.Point(15, 12);
             this.lblErabiltzaile.Name = "lblErabiltzaile";
-            this.lblErabiltzaile.Size = new System.Drawing.Size(121, 28);
+            this.lblErabiltzaile.Size = new System.Drawing.Size(118, 28);
             this.lblErabiltzaile.TabIndex = 0;
             this.lblErabiltzaile.Text = "Erabiltzailea";
             // 
@@ -54,10 +56,10 @@
             this.txtSarrera.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(242)))), ((int)(((byte)(245)))));
             this.txtSarrera.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtSarrera.Font = new System.Drawing.Font("Segoe UI", 11F);
-            this.txtSarrera.Location = new System.Drawing.Point(15, 12);
+            this.txtSarrera.Location = new System.Drawing.Point(71, 12);
             this.txtSarrera.Multiline = true;
             this.txtSarrera.Name = "txtSarrera";
-            this.txtSarrera.Size = new System.Drawing.Size(350, 35);
+            this.txtSarrera.Size = new System.Drawing.Size(294, 35);
             this.txtSarrera.TabIndex = 2;
             // 
             // btnBidali
@@ -81,6 +83,7 @@
             // pnlSarrera
             // 
             this.pnlSarrera.BackColor = System.Drawing.Color.White;
+            this.pnlSarrera.Controls.Add(this.Fitxategi_Botoia);
             this.pnlSarrera.Controls.Add(this.txtSarrera);
             this.pnlSarrera.Controls.Add(this.btnBidali);
             this.pnlSarrera.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -88,6 +91,15 @@
             this.pnlSarrera.Name = "pnlSarrera";
             this.pnlSarrera.Size = new System.Drawing.Size(500, 60);
             this.pnlSarrera.TabIndex = 4;
+            // 
+            // Fitxategi_Botoia
+            // 
+            this.Fitxategi_Botoia.Image = ((System.Drawing.Image)(resources.GetObject("Fitxategi_Botoia.Image")));
+            this.Fitxategi_Botoia.Location = new System.Drawing.Point(12, 10);
+            this.Fitxategi_Botoia.Name = "Fitxategi_Botoia";
+            this.Fitxategi_Botoia.Size = new System.Drawing.Size(42, 42);
+            this.Fitxategi_Botoia.TabIndex = 0;
+            this.Fitxategi_Botoia.UseVisualStyleBackColor = true;
             // 
             // pnlGoiburua
             // 
@@ -129,5 +141,6 @@
         private System.Windows.Forms.Button btnBidali;
         private System.Windows.Forms.Panel pnlSarrera;
         private System.Windows.Forms.Panel pnlGoiburua;
+        private System.Windows.Forms.Button Fitxategi_Botoia;
     }
 }
