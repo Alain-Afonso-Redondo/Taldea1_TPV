@@ -23,17 +23,21 @@ namespace Taldea1TPV
             lblErabiltzaile.Text = "Kaixo, " + erabiltzaileIzena;
 
             txtSarrera.KeyDown += (s, e) => {
-                if (e.KeyCode == Keys.Enter && !e.Shift) {
+                if (e.KeyCode == Keys.Enter && !e.Shift)
+                {
                     btnBidali_Klik(null, null);
                     e.SuppressKeyPress = true;
                 }
             };
 
             flpMezuak.SizeChanged += (s, e) => {
-                foreach (Control c in flpMezuak.Controls) {
+                foreach (Control c in flpMezuak.Controls)
+                {
                     if (c is Panel p) p.Width = flpMezuak.ClientSize.Width - 25;
                 }
             };
+
+            Fitxategi_Botoia.Click += Fitxategi_Botoia_Click;
         }
 
         private void TxatForm_Load(object sender, EventArgs e)
@@ -50,8 +54,6 @@ namespace Taldea1TPV
 
                 irakurlea = new StreamReader(ns);
                 idazlea = new StreamWriter(ns) { AutoFlush = true };
-
-                idazlea.WriteLine(erabiltzaileIzena);
 
                 entzunHari = new Thread(entzunBuklea);
                 entzunHari.IsBackground = true;
@@ -79,39 +81,10 @@ namespace Taldea1TPV
 
         private void idatziMezua(string msg)
         {
-            string msgNormalizado = msg.Trim();
-            string azkenNormalizado = azkenBidalitakoMezua.Trim();
-
-            // Filtrar mensajes que contengan "Sistemaren mezua" o que no tengan separadores.
-            // Esto evita mostrar notificaciones técnicas del servidor como burbujas de chat.
-            if (msgNormalizado.IndexOf("Sistemaren mezua", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                return;
-            }
-
-            string[] separadoreak = { ":", ">", "-", "]", "»" };
-            bool baduSeparadorerik = false;
-            foreach (var sep in separadoreak) { if (msg.Contains(sep)) { baduSeparadorerik = true; break; } }
-            
-            if (!baduSeparadorerik)
-            {
-                return;
-            }
-            
-            if (!string.IsNullOrEmpty(azkenNormalizado) && msgNormalizado == azkenNormalizado)
-            {
-                azkenBidalitakoMezua = "";
-                return;
-            }
-
             if (flpMezuak.InvokeRequired)
-            {
                 flpMezuak.Invoke(new Action(() => GehituMezuBurbula(msg)));
-            }
             else
-            {
                 GehituMezuBurbula(msg);
-            }
         }
 
         private void GehituMezuBurbula(string msg)
@@ -119,10 +92,9 @@ namespace Taldea1TPV
             string edukia = msg;
             string bidaltzailea = "";
 
-            // List of common separators between sender and message
             string[] separadoreak = { ":", ">", "-", "]", "»" };
             int index = -1;
-            string aukeratutakoSeparadorea = "";
+            string sepUsed = "";
 
             foreach (var sep in separadoreak)
             {
@@ -130,97 +102,121 @@ namespace Taldea1TPV
                 if (pos > 0 && (index == -1 || pos < index))
                 {
                     index = pos;
-                    aukeratutakoSeparadorea = sep;
+                    sepUsed = sep;
                 }
             }
 
             if (index != -1)
             {
                 bidaltzailea = msg.Substring(0, index).Trim();
-                
-                // If it was a closing bracket, we might have an opening bracket at the start
-                if (aukeratutakoSeparadorea == "]" && bidaltzailea.StartsWith("["))
-                {
-                    bidaltzailea = bidaltzailea.Substring(1).Trim();
-                }
-
-                edukia = msg.Substring(index + aukeratutakoSeparadorea.Length).Trim();
+                edukia = msg.Substring(index + sepUsed.Length).Trim();
             }
 
-            // Ignorar mensajes si el remitente es genérico o del sistema
-            if (string.IsNullOrWhiteSpace(bidaltzailea) || 
-                bidaltzailea.IndexOf("Sistemaren mezua", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                bidaltzailea.Equals("System", StringComparison.OrdinalIgnoreCase) ||
-                bidaltzailea.Equals("Server", StringComparison.OrdinalIgnoreCase))
+            bool esArchivo = false;
+            string fileNameTemp = "";
+            byte[] fileBytesTemp = null;
+
+            if (edukia.StartsWith("[FILE]|"))
             {
-                return;
+                string[] parts = edukia.Split('|');
+
+                if (parts.Length == 3)
+                {
+                    fileNameTemp = parts[1];
+                    fileBytesTemp = Convert.FromBase64String(parts[2]);
+                    edukia = "📎 " + fileNameTemp;
+                    esArchivo = true;
+                }
             }
 
             bool nireaDa = string.Equals(bidaltzailea, erabiltzaileIzena, StringComparison.OrdinalIgnoreCase);
 
             Panel pnlLerroa = new Panel();
             pnlLerroa.Width = flpMezuak.ClientSize.Width - 20;
-            pnlLerroa.Height = 80;
+            pnlLerroa.AutoSize = true;
             pnlLerroa.Padding = new Padding(5);
-            pnlLerroa.Margin = new Padding(0, 2, 0, 2);
+            pnlLerroa.Margin = new Padding(0, 3, 0, 3);
 
             FlowLayoutPanel pnlBurbula = new FlowLayoutPanel();
             pnlBurbula.FlowDirection = FlowDirection.TopDown;
             pnlBurbula.AutoSize = true;
-            pnlBurbula.Padding = new Padding(12, 8, 12, 8);
+            pnlBurbula.WrapContents = true;
             pnlBurbula.MaximumSize = new System.Drawing.Size((int)(pnlLerroa.Width * 0.65), 0);
 
             Label lblIzena = new Label();
             lblIzena.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             lblIzena.AutoSize = true;
-            lblIzena.Margin = new Padding(0, 0, 0, 3);
 
             Label lblMezua = new Label();
             lblMezua.Text = edukia;
             lblMezua.AutoSize = true;
-            lblMezua.Font = new System.Drawing.Font("Segoe UI", 10F);
-            lblMezua.MaximumSize = new System.Drawing.Size(pnlBurbula.MaximumSize.Width - 24, 0);
-            lblMezua.Margin = new Padding(0);
+            lblMezua.MaximumSize = new System.Drawing.Size(pnlBurbula.MaximumSize.Width - 20, 0);
 
             if (nireaDa)
             {
                 pnlBurbula.BackColor = System.Drawing.Color.FromArgb(0, 132, 255);
+                pnlBurbula.BorderStyle = BorderStyle.FixedSingle;
+                pnlBurbula.Padding = new Padding(12, 8, 12, 8);
+                pnlBurbula.Margin = new Padding(50, 5, 5, 12);
+
                 lblMezua.ForeColor = System.Drawing.Color.White;
                 lblIzena.Text = "Zu";
                 lblIzena.ForeColor = System.Drawing.Color.White;
-                pnlBurbula.Anchor = AnchorStyles.Right;
-                pnlBurbula.Dock = DockStyle.Right;
             }
             else
             {
-                pnlBurbula.BackColor = System.Drawing.Color.FromArgb(230, 230, 230);
+                pnlBurbula.BackColor = System.Drawing.Color.White;
+                pnlBurbula.BorderStyle = BorderStyle.FixedSingle;
+                pnlBurbula.Padding = new Padding(12, 8, 12, 8);
+                pnlBurbula.Margin = new Padding(5, 5, 50, 12);
+
                 lblMezua.ForeColor = System.Drawing.Color.Black;
-                lblIzena.ForeColor = System.Drawing.Color.FromArgb(80, 80, 80);
-                
-                if (!string.IsNullOrEmpty(bidaltzailea))
-                {
-                    lblIzena.Text = bidaltzailea;
-                    lblIzena.Visible = true;
-                }
-                else
-                {
-                    lblIzena.Text = "";
-                    lblIzena.Visible = false;
-                }
-                
-                pnlBurbula.Anchor = AnchorStyles.Left;
-                pnlBurbula.Dock = DockStyle.Left;
+                lblIzena.ForeColor = System.Drawing.Color.Gray;
+
+                lblIzena.Text = bidaltzailea;
+                lblIzena.Visible = !string.IsNullOrEmpty(bidaltzailea);
             }
 
             pnlBurbula.Controls.Add(lblIzena);
             pnlBurbula.Controls.Add(lblMezua);
+
+            if (esArchivo && fileBytesTemp != null)
+            {
+                Button btnGorde = new Button();
+                btnGorde.Text = "Gorde";
+                btnGorde.AutoSize = true;
+
+                btnGorde.Click += (s, e) =>
+                {
+                    SaveFileDialog sfd = new SaveFileDialog();
+                    sfd.FileName = fileNameTemp;
+
+                    if (sfd.ShowDialog() == DialogResult.OK)
+                        File.WriteAllBytes(sfd.FileName, fileBytesTemp);
+                };
+
+                pnlBurbula.Controls.Add(btnGorde);
+            }
+
             pnlLerroa.Controls.Add(pnlBurbula);
 
-            flpMezuak.Controls.Add(pnlLerroa);
+            pnlBurbula.Anchor = nireaDa
+                ? AnchorStyles.Top | AnchorStyles.Right
+                : AnchorStyles.Top | AnchorStyles.Left;
 
-            pnlLerroa.PerformLayout();
+            if (nireaDa)
+            {
+                pnlBurbula.Left = pnlLerroa.Width - pnlBurbula.Width - 10;
+            }
+            else
+            {
+                pnlBurbula.Left = 10;
+            }
+
+            flpMezuak.Controls.Add(pnlLerroa);
             flpMezuak.ScrollControlIntoView(pnlLerroa);
         }
+
 
         private void btnBidali_Klik(object sender, EventArgs e)
         {
@@ -230,12 +226,39 @@ namespace Taldea1TPV
             if (mezua == "") return;
 
             string mezuaOsoa = erabiltzaileIzena + ": " + mezua;
+
             idazlea.WriteLine(mezuaOsoa);
-            azkenBidalitakoMezua = mezuaOsoa;
-            GehituMezuBurbula(mezuaOsoa);
 
             txtSarrera.Text = "";
         }
+
+        private void Fitxategi_Botoia_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                FileInfo fi = new FileInfo(ofd.FileName);
+
+                if (fi.Length > 5 * 1024 * 1024)
+                {
+                    MessageBox.Show("❌ Errorea, aukeratutako elementua handiegia da.");
+                    return;
+                }
+
+                byte[] bytes = File.ReadAllBytes(ofd.FileName);
+                string base64 = Convert.ToBase64String(bytes);
+
+                string mensaje = $"[FILE]|{fi.Name}|{base64}";
+                string mezuaOsoa = erabiltzaileIzena + ": " + mensaje;
+
+                idazlea.WriteLine(mezuaOsoa);
+
+            }
+
+        }
+
+
 
         private void TxatForm_FormClosing(object sender, FormClosingEventArgs e)
         {
