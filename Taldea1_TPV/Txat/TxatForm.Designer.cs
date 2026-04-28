@@ -122,7 +122,7 @@
             this.MaximizeBox = false;
             this.Name = "TxatForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Txata Profesionala";
+            this.Text = "AJA - Txata";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TxatForm_FormClosing);
             this.Load += new System.EventHandler(this.TxatForm_Load);
             this.pnlSarrera.ResumeLayout(false);
