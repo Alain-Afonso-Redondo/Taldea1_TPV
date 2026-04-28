@@ -112,6 +112,8 @@ namespace Taldea1TPV
                 edukia = msg.Substring(index + sepUsed.Length).Trim();
             }
 
+            edukia = TxatCryptoLaguntzailea.DesenkriptatuBeharBada(edukia);
+
             bool esArchivo = false;
             string fileNameTemp = "";
             byte[] fileBytesTemp = null;
@@ -225,7 +227,7 @@ namespace Taldea1TPV
             string mezua = txtSarrera.Text.Trim();
             if (mezua == "") return;
 
-            string mezuaOsoa = erabiltzaileIzena + ": " + mezua;
+            string mezuaOsoa = erabiltzaileIzena + ": " + TxatCryptoLaguntzailea.Enkriptatu(mezua);
 
             idazlea.WriteLine(mezuaOsoa);
 
@@ -250,7 +252,7 @@ namespace Taldea1TPV
                 string base64 = Convert.ToBase64String(bytes);
 
                 string mensaje = $"[FILE]|{fi.Name}|{base64}";
-                string mezuaOsoa = erabiltzaileIzena + ": " + mensaje;
+                string mezuaOsoa = erabiltzaileIzena + ": " + TxatCryptoLaguntzailea.Enkriptatu(mensaje);
 
                 idazlea.WriteLine(mezuaOsoa);
 

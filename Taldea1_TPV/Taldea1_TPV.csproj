@@ -244,6 +244,7 @@
     <Compile Include="Txat\TxatForm.Designer.cs">
       <DependentUpon>TxatForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Txat\TxatCryptoLaguntzailea.cs" />
     <Compile Include="Txat\TxatBotoiaLaguntzailea.cs" />
     <Compile Include="Erabiltzaileak\Erabiltzaileak.cs" />
     <Compile Include="Erabiltzaileak\Saioa.cs" />
