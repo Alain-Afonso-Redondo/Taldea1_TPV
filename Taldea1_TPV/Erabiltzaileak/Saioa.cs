@@ -5,3 +5,4 @@ namespace Taldea1TPV
         public static Erabiltzaileak UnekoErabiltzailea { get; set; }
     }
 }
+ 
