@@ -14,7 +14,7 @@ namespace Taldea1TPV
             get
             {
                 var value = ConfigurationManager.AppSettings["ApiBaseUrl"];
-                return string.IsNullOrWhiteSpace(value) ? "http://localhost:5093/" : value;
+                return string.IsNullOrWhiteSpace(value) ? "http://192.168.10.5:5093/" : value;
             }
         }
 
@@ -23,7 +23,7 @@ namespace Taldea1TPV
             get
             {
                 var value = ConfigurationManager.AppSettings["OdooApiBaseUrl"];
-                return string.IsNullOrWhiteSpace(value) ? "http://localhost:5015/" : value;
+                return string.IsNullOrWhiteSpace(value) ? "http://192.168.10.5:5015/" : value;
             }
         }
     }
