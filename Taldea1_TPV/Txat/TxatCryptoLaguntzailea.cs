@@ -28,19 +28,23 @@ namespace Taldea1TPV
                     Buffer.BlockCopy(aes.IV, 0, payload, 0, aes.IV.Length);
                     Buffer.BlockCopy(encrypted, 0, payload, aes.IV.Length, encrypted.Length);
 
-                    return Prefix + Convert.ToBase64String(payload);
+                    return Convert.ToBase64String(payload);
                 }
             }
         }
 
         public static string DesenkriptatuBeharBada(string testua)
         {
-            if (string.IsNullOrWhiteSpace(testua) || !testua.StartsWith(Prefix))
+            if (string.IsNullOrWhiteSpace(testua))
                 return testua;
 
             try
             {
-                byte[] payload = Convert.FromBase64String(testua.Substring(Prefix.Length));
+                string encryptedText = testua.StartsWith(Prefix)
+                    ? testua.Substring(Prefix.Length)
+                    : testua;
+
+                byte[] payload = Convert.FromBase64String(encryptedText);
                 if (payload.Length <= IvSize)
                     return testua;
 
