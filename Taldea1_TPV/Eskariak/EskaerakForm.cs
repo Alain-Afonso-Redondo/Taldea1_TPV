@@ -362,7 +362,23 @@ namespace Taldea1TPV.Eskariak
                 return;
             }
 
+            if (!karritoa.Any())
+            {
+                MessageBox.Show("Karritoa hutsik dago.");
+                return;
+            }
+
             var komandaController = new KomandakController();
+            string eguneratuErrorea;
+            if (!komandaController.EguneratuEskaera(_eskaeraId.Value, _komensalak, karritoa, out eguneratuErrorea))
+            {
+                MessageBox.Show(
+                    string.IsNullOrWhiteSpace(eguneratuErrorea) ? "Ezin izan da eskaera eguneratu faktura itxi aurretik." : eguneratuErrorea,
+                    "Errorea",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
             var deskontuGaldera = ErakutsiBaiEzLeihoa(
                 "Deskontua",
                 "Baduzu deskontu koderik?",

@@ -168,7 +168,7 @@ namespace Taldea1TPV.Eskariak
             if (string.Equals(mahai.Egoera, "okupatuta", StringComparison.OrdinalIgnoreCase))
                 return Color.FromArgb(255, 241, 224);
 
-            if (erreserba != null && erreserba.Egoera != "amaituta")
+            if (erreserba != null && erreserba.Egoera != "eginda")
                 return Color.FromArgb(255, 230, 230);
 
             return Color.White;
@@ -245,7 +245,7 @@ namespace Taldea1TPV.Eskariak
             if (string.Equals(mahai.Egoera, "okupatuta", StringComparison.OrdinalIgnoreCase))
                 return "OKUPATUTA";
 
-            if (erreserba != null && erreserba.Egoera != "amaituta")
+            if (erreserba != null && erreserba.Egoera != "eginda")
                 return "ERRESERBATUTA";
 
             return "LIBRE";
@@ -256,7 +256,7 @@ namespace Taldea1TPV.Eskariak
             if (string.Equals(mahai.Egoera, "okupatuta", StringComparison.OrdinalIgnoreCase))
                 return Color.FromArgb(184, 90, 24);
 
-            if (erreserba != null && erreserba.Egoera != "amaituta")
+            if (erreserba != null && erreserba.Egoera != "eginda")
                 return Color.FromArgb(160, 40, 40);
 
             return Color.FromArgb(28, 95, 43);
