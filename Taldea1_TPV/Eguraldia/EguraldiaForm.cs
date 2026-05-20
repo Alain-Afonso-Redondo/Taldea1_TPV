@@ -224,31 +224,17 @@ namespace Taldea1TPV.Eguraldia
         private static string AurkituXmlBidea()
         {
             var baseBidea = AppDomain.CurrentDomain.BaseDirectory;
-            var hautagaiak = new List<string>
-            {
-                Path.Combine(baseBidea, "Xml_eraldatuta.xml"),
-                Path.Combine(baseBidea, "Taldea1_Java_XML", "Xml_eraldatuta.xml"),
-                Path.Combine(Environment.CurrentDirectory, "Xml_eraldatuta.xml"),
-                Path.Combine(Environment.CurrentDirectory, "..", "Taldea1_Java_XML", "Xml_eraldatuta.xml")
-            };
-
             var direktorioa = new DirectoryInfo(baseBidea);
             for (var i = 0; i < 6 && direktorioa != null; i++)
             {
-                hautagaiak.Add(Path.Combine(direktorioa.FullName, "Xml_eraldatuta.xml"));
-                hautagaiak.Add(Path.Combine(direktorioa.FullName, "Taldea1_Java_XML", "Xml_eraldatuta.xml"));
-                hautagaiak.Add(Path.Combine(direktorioa.FullName, "..", "Taldea1_Java_XML", "Xml_eraldatuta.xml"));
+                var bidea = Path.GetFullPath(Path.Combine(direktorioa.FullName, "XML_eguraldirako", "Xml_eraldatuta.xml"));
+                if (File.Exists(bidea))
+                    return bidea;
+
                 direktorioa = direktorioa.Parent;
             }
 
-            var bidea = hautagaiak
-                .Select(Path.GetFullPath)
-                .FirstOrDefault(File.Exists);
-
-            if (bidea == null)
-                throw new FileNotFoundException("Ezin izan da Xml_eraldatuta.xml aurkitu.");
-
-            return bidea;
+            throw new FileNotFoundException("Ezin izan da XML_eguraldirako\\Xml_eraldatuta.xml aurkitu.");
         }
 
         private static string AurkituIrudiBidea(string irudia)
