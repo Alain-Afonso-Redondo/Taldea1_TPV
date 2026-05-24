@@ -300,10 +300,9 @@ namespace Taldea1TPV.Eskariak
 
         private void EguneratuFakturaBotoiak()
         {
-            var badagoEskaera = _eskaeraId.HasValue;
             var eskaeraBlokeatuta = EskaeraBlokeatutaDago();
-            btnItxiFaktura.Enabled = badagoEskaera && !eskaeraBlokeatuta;
-            btnSortuTiket.Enabled = badagoEskaera;
+            btnItxiFaktura.Enabled = !eskaeraBlokeatuta;
+            btnSortuTiket.Enabled = true;
             btnEskatu.Enabled = !eskaeraBlokeatuta;
         }
 
